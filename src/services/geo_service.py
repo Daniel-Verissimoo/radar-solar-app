@@ -130,8 +130,11 @@ async def obter_geojson_rmr_assincrono() -> dict:
 
 @lru_cache(maxsize=1)
 def carregar_geojson_rmr() -> dict:
-    return _ler_geojson_estatico(GEOJSON_PRONTO_PATH)
-    pass  # Fim do cache estatico - GeoJSON gerado offline pelo script gerar_mapa_geojson.py
+    try:
+        return _ler_geojson_estatico(GEOJSON_PRONTO_PATH)
+    except FileNotFoundError:
+        log_aviso(f'GeoJSON nao encontrado em {GEOJSON_PRONTO_PATH}')
+        return {'type': 'FeatureCollection', 'features': [], 'municipios': {'type': 'FeatureCollection', 'features': []}, 'bairrosPorMunicipio': {}}
 
 
 
