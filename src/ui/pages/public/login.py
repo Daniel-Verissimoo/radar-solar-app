@@ -49,30 +49,28 @@ def _render_login_intro() -> None:
         ).classes('max-w-xl text-sm text-slate-500 leading-6')
 
 
-async def _send_magic_link(email: Any, active_profile: dict[str, str]) -> None:
-    current_email = (email.value or '').strip()
+def _send_magic_link(email_input: Any, profile_value: str) -> None:
+    current_email = (email_input.value or '').strip()
     if not current_email:
         ui.notify('Informe o e-mail para receber o link.', type='warning')
         return
     try:
-        current_email = validar_email_para_profile(current_email, active_profile['value'])
+        current_email = validar_email_para_profile(current_email, profile_value)
     except PerfilConflitanteError as exc:
         ui.notify(str(exc), type='warning')
         return
 
-    log_info(f'Login: enviando magic link (perfil={active_profile["value"]})')
-    result = await ui.run_javascript(
-        (
-            '(async () => {'
-            f'  return await window.radarSolarAuth.sendMagicLink({current_email!r}, {active_profile["value"]!r});'
-            '})()'
-        ),
-        timeout=60,
-    )
-    if result and result.get('ok'):
-        ui.notify('Link de acesso enviado. Verifique seu e-mail.', type='positive')
-    else:
-        ui.notify(result.get('error', 'Nao foi possivel enviar o magic link.'), type='negative')
+    log_info(f'Login: enviando magic link (perfil={profile_value})')
+    ui.notify('Enviando link de acesso...', type='info')
+    ui.run_javascript(f'''
+        (async () => {{
+            const result = await window.radarSolarAuth.sendMagicLink({current_email!r}, {profile_value!r});
+            console.log('Firebase result:', JSON.stringify(result));
+            if (!result.ok) {{
+                alert('Erro: ' + (result.error || 'Falha ao enviar link'));
+            }}
+        }})();
+    ''')
 
 
 def render_login(selected_profile: str = 'customer') -> None:
@@ -119,10 +117,12 @@ def render_login(selected_profile: str = 'customer') -> None:
                         'text-sm text-slate-500 leading-6'
                     )
 
-                async def send_magic_link() -> None:
-                    await _send_magic_link(email, active_profile)
+                def send_magic_link() -> None:
+                    _send_magic_link(email, active_profile['value'])
 
                 action = ui.button('', on_click=send_magic_link).classes('w-full py-3 text-base font-semibold rounded-xl rs-button-soft')
+
+                ui.button('Teste', on_click=lambda: ui.notify('Clique funcionou!', type='positive')).classes('w-full py-2 text-sm rounded-xl')
                 ui.link('Voltar para a página inicial', '/').classes('text-sm text-slate-500')
 
     def set_profile(profile_key: str) -> None:
