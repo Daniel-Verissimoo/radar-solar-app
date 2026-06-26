@@ -16,7 +16,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY src/ src/
 COPY data/ data/
-COPY .env .env
 
 RUN chown -R radarsolar:radarsolar /app
 
