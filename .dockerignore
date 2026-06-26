@@ -1,0 +1,13 @@
+.venv
+.idea
+__pycache__
+*.pyc
+.git
+.gitignore
+.gitattributes
+.dockerignore
+README.md
+*.md
+scripts/
+data/data/raw/
+data/data/external/

@@ -1,0 +1,31 @@
+# ----------------------------------------------------------------------
+# 1. AMBIENTE PYTHON E CACHE
+# ----------------------------------------------------------------------
+# Ignorar ambiente virtual e cache do Python
+.venv/
+__pycache__/
+*.pyc
+
+# ----------------------------------------------------------------------
+# 2. CONFIGURAÇÕES LOCAIS DE IDES
+# ----------------------------------------------------------------------
+# Ignorar pastas de configuração de editores (PyCharm, VS Code, etc.)
+.idea/
+.vscode/
+.nicegui/
+
+# ----------------------------------------------------------------------
+# 3. DADOS, BANCO DE DADOS E ARQUIVOS PESADOS
+# ----------------------------------------------------------------------
+# Ignora todo o conteúdo da pasta data (evita subir dados locais)...
+data/*
+
+# ...EXCETO o ficheiro .gitkeep (para a pasta existir no GitHub)
+!data/.gitkeep
+
+# Ignorar bases de dados locais e ficheiros de dados em qualquer diretório
+*.db
+*.sqlite3
+*.parquet
+*.csv
+.env

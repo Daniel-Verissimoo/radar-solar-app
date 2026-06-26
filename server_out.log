@@ -1,0 +1,13 @@
+[10:14:11]  OK    Conexao PostgreSQL estabelecida: localhost/radarsolar
+[10:14:12]  INFO  Normalizacao carregada: 158 sinonimos de modulos -> 105 canonicos, 164 sinonimos de inversores -> 52 canonicos
+
+==================================================
+  Radar Solar - Inicializacao
+==================================================
+[10:14:12]  INFO  Criando/verificando tabelas do banco de dados...
+[10:14:12]  INFO  Registrando rotas de arquivos estaticos...
+[10:14:12]  OK    Arquivos estaticos registrados: /assets, /demo/static
+
+==================================================
+[10:14:12]  INFO  Iniciando servidor NiceGUI em localhost:8080...
+NiceGUI ready to go on http://localhost:8080

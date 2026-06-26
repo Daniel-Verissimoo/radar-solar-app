@@ -1,0 +1,217 @@
+@keyframes rs-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rs-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes rs-soft-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.0);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(249, 115, 22, 0.04);
+    }
+}
+
+body {
+    background:
+        radial-gradient(circle at top, rgba(249, 115, 22, 0.12), transparent 28%),
+        linear-gradient(180deg, #fffaf5 0%, #f8fafc 30%, #eef4ff 100%);
+    color: #0f172a;
+}
+
+.rs-shell {
+    width: 100%;
+}
+
+.rs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.rs-panel {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+}
+
+.rs-card {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.rs-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.14);
+}
+
+.rs-hover-soft {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.rs-hover-soft:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+}
+
+.rs-animate-up {
+    animation: rs-fade-up 0.55s ease both;
+}
+
+.rs-animate-up-delay-1 {
+    animation-delay: 0.08s;
+}
+
+.rs-animate-up-delay-2 {
+    animation-delay: 0.16s;
+}
+
+.rs-animate-up-delay-3 {
+    animation-delay: 0.24s;
+}
+
+.rs-animate-in {
+    animation: rs-fade-in 0.45s ease both;
+}
+
+.rs-button-soft {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.rs-button-soft:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.02);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.10);
+}
+
+.rs-profile-card {
+    cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.rs-profile-card.is-active {
+    border-color: rgba(249, 115, 22, 0.9);
+    box-shadow: 0 26px 60px rgba(249, 115, 22, 0.18);
+    transform: translateY(-4px);
+}
+
+.rs-hero-title {
+    line-height: 1.02;
+}
+
+.rs-badge {
+    letter-spacing: 0;
+}
+
+.rs-profile-option {
+    cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.rs-profile-option.is-active {
+    border-color: rgba(29, 41, 59, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+.rs-login-shell {
+    max-width: 1120px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.92fr) minmax(380px, 1.08fr);
+    gap: 2rem;
+    align-items: center;
+}
+
+.rs-login-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.rs-login-tab {
+    cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(255, 255, 255, 0.72);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    min-height: 144px;
+}
+
+.rs-login-tab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.rs-login-tab.is-active {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.10);
+    animation: rs-soft-pulse 1.4s ease;
+}
+
+.rs-login-tab.customer.is-active {
+    border-color: rgba(249, 115, 22, 0.85);
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.rs-login-tab.company.is-active {
+    border-color: rgba(29, 41, 59, 0.88);
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.92) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.rs-login-panel {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, transform 0.22s ease;
+    min-height: 620px;
+}
+
+.rs-login-panel.customer {
+    border-color: rgba(249, 115, 22, 0.26);
+    box-shadow: 0 26px 60px rgba(249, 115, 22, 0.10);
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.94) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.rs-login-panel.company {
+    border-color: rgba(29, 41, 59, 0.22);
+    box-shadow: 0 26px 60px rgba(15, 23, 42, 0.10);
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.94) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.rs-login-panel:hover {
+    transform: translateY(-2px);
+}
+
+.rs-login-copy {
+    min-height: 112px;
+}
+
+.rs-login-selected {
+    min-height: 32px;
+}
+
+.rs-login-helper {
+    min-height: 48px;
+}
+
+@media (max-width: 900px) {
+    .rs-login-shell {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: radar-solar
+Version: 0.1.0
+Requires-Python: >=3.12
+License-File: LICENSE
+Requires-Dist: nicegui>=3.12.1
+Requires-Dist: openpyxl>=3.1.5
+Requires-Dist: pandas>=3.0.3
+Requires-Dist: peewee>=4.0.6
+Requires-Dist: pyarrow>=24.0.0
+Requires-Dist: pyshp>=3.0.12
+Dynamic: license-file

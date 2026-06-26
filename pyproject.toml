@@ -1,0 +1,12 @@
+[project]
+name = "radar-solar"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "nicegui>=3.12.1",
+    "openpyxl>=3.1.5",
+    "pandas>=3.0.3",
+    "peewee>=4.0.6",
+    "pyarrow>=24.0.0",
+    "pyshp>=3.0.12",
+]

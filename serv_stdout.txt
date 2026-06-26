@@ -1,0 +1,16 @@
+[21:22:30]  INFO  Banco SQLite: C:\radar-solar-copia\radar-solar-dev\data\radarsolar.db
+[21:22:30]  OK    Conexao SQLite estabelecida com foreign_keys=ON
+[21:22:30]  INFO  Normalizacao carregada: 158 sinonimos de modulos -> 105 canonicos, 164 sinonimos de inversores -> 52 canonicos
+
+==================================================
+  Radar Solar - Inicializacao
+==================================================
+[21:22:30]  INFO  Criando/verificando tabelas do banco SQLite...
+[21:22:30]  OK    Tabelas criadas/verificadas: Usuario, EmpresaPerfil, InstalacaoSolar, Fatura, Lead, CnpjCache
+[21:22:30]  OK    Tabelas verificadas/criadas com sucesso
+[21:22:30]  INFO  Registrando rotas de arquivos estaticos...
+[21:22:30]  OK    Arquivos estaticos registrados: /assets, /demo/static
+
+==================================================
+[21:22:30]  INFO  Iniciando servidor NiceGUI na porta 8080...
+NiceGUI ready to go on http://localhost:8080
