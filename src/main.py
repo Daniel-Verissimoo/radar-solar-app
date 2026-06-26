@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
+import httpx
 from nicegui import app, ui
 from dotenv import load_dotenv
 from fastapi import Request, HTTPException
@@ -13,6 +14,7 @@ from fastapi.responses import JSONResponse
 # veja DATABASE_URL do .env
 load_dotenv()
 
+from src.auth import PerfilConflitanteError, criar_ou_atualizar_usuario, rota_inicial, serializar_sessao
 from src.models import criar_tabelas, Usuario
 from src.ui.layout import render_private_shell
 from src.ui.pages.cliente.spa import render_cliente_spa
@@ -200,6 +202,78 @@ def auth_confirm() -> None:
         return
     apply_theme()
     render_auth_confirm()
+
+def _verificar_token_firebase_sync(id_token: str) -> dict | None:
+    if not id_token:
+        return None
+    api_key = os.getenv('FIREBASE_API_KEY', '')
+    url = f'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={api_key}'
+    try:
+        with httpx.Client() as client:
+            r = client.post(url, json={'idToken': id_token}, timeout=10)
+            if r.status_code == 200:
+                users = r.json().get('users', [])
+                if users:
+                    return users[0]
+    except Exception:
+        pass
+    return None
+
+@ui.page('/auth/exchange')
+def auth_exchange(request: Request) -> None:
+    log_info('ROTA /auth/exchange')
+    auth = app.storage.user.get('auth')
+    if auth:
+        apply_theme()
+        render_redirect('/cliente/dashboard' if auth.get('profile') == 'customer' else '/empresa/mapa')
+        return
+
+    id_token = request.query_params.get('id_token', '')
+    profile = request.query_params.get('profile', 'customer')
+    email = request.query_params.get('email', '')
+    firebase_uid = request.query_params.get('firebase_uid', '')
+    display_name = request.query_params.get('display_name', '')
+
+    if not id_token or not email or not firebase_uid:
+        log_aviso('Auth: exchange com parametros insuficientes')
+        apply_theme()
+        render_redirect('/login', 'Link de acesso invalido.')
+        return
+
+    verified = _verificar_token_firebase_sync(id_token)
+    if not verified:
+        log_aviso('Auth: token Firebase invalido no exchange')
+        apply_theme()
+        render_redirect('/login', 'Nao foi possivel validar sua identidade.')
+        return
+
+    verified_uid = verified.get('localId', '')
+    verified_email = verified.get('email', '') or email
+
+    if verified_uid != firebase_uid:
+        log_aviso(f'Auth: UID divergente (payload={firebase_uid}, verified={verified_uid})')
+        apply_theme()
+        render_redirect('/login', 'Falha de seguranca na autenticacao.')
+        return
+
+    try:
+        usuario, _created = criar_ou_atualizar_usuario(
+            firebase_uid=verified_uid,
+            email=verified_email,
+            profile=profile,
+            nome=display_name,
+        )
+    except PerfilConflitanteError as exc:
+        log_aviso(f'Auth: conflito de perfil no exchange: {exc}')
+        apply_theme()
+        render_redirect('/login', str(exc))
+        return
+
+    log_ok(f'Auth exchange: {verified_email} autenticado com sucesso (perfil={profile})')
+    app.storage.user['auth'] = serializar_sessao(usuario, profile)
+    app.storage.user['auth_created_at'] = time.time()
+    apply_theme()
+    render_redirect(rota_inicial(profile))
 
 @ui.page('/logout')
 def logout() -> None:
