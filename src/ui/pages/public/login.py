@@ -50,31 +50,27 @@ def _render_login_intro() -> None:
 
 
 def _send_magic_link(email_input: Any, profile_value: str) -> None:
-    try:
-        current_email = (email_input.value or '').strip()
-        ui.notify(f'Depuracao: email digitado = "{current_email}"', type='info')
-        if not current_email:
-            ui.notify('Informe o e-mail para receber o link.', type='warning')
-            return
-        try:
-            current_email = validar_email_para_profile(current_email, profile_value)
-        except PerfilConflitanteError as exc:
-            ui.notify(str(exc), type='warning')
-            return
+    current_email = (email_input.value or '').strip()
+    if not current_email:
+        ui.notify('Informe o e-mail para receber o link.', type='warning')
+        return
 
-        log_info(f'Login: enviando magic link (perfil={profile_value})')
-        ui.notify('Enviando link de acesso...', type='info')
-        ui.run_javascript(f'''
-            (async () => {{
-                const result = await window.radarSolarAuth.sendMagicLink({current_email!r}, {profile_value!r});
-                console.log('Firebase result:', JSON.stringify(result));
-                if (!result.ok) {{
-                    alert('Erro: ' + (result.error || 'Falha ao enviar link'));
-                }}
-            }})();
-        ''')
-    except Exception as e:
-        ui.notify(f'Erro interno: {e}', type='negative')
+    try:
+        current_email = validar_email_para_profile(current_email, profile_value)
+    except PerfilConflitanteError as exc:
+        ui.notify(str(exc), type='warning')
+        return
+
+    log_info(f'Login: enviando magic link (perfil={profile_value})')
+    ui.notify('Link de acesso enviado! Verifique seu e-mail.', type='positive')
+    ui.run_javascript(f'''
+        (async () => {{
+            const result = await window.radarSolarAuth.sendMagicLink({current_email!r}, {profile_value!r});
+            if (!result.ok && result.error) {{
+                alert('Erro: ' + result.error);
+            }}
+        }})();
+    ''')
 
 
 def render_login(selected_profile: str = 'customer') -> None:
@@ -125,8 +121,6 @@ def render_login(selected_profile: str = 'customer') -> None:
                     _send_magic_link(email, active_profile['value'])
 
                 action = ui.button('', on_click=send_magic_link).classes('w-full py-3 text-base font-semibold rounded-xl rs-button-soft')
-
-                ui.button('Teste', on_click=lambda: ui.notify('Clique funcionou!', type='positive')).classes('w-full py-2 text-sm rounded-xl')
                 ui.link('Voltar para a página inicial', '/').classes('text-sm text-slate-500')
 
     def set_profile(profile_key: str) -> None:
