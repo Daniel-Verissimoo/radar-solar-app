@@ -631,10 +631,11 @@
                     const lng = Number(pj.lng);
                     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
                     const captured = capturedCnpjs.has(pj.cnpj);
-                    const pinColor = captured ? '#16a34a' : '#7c3aed';
+                    const pinColor = captured ? '#16a34a' : '#f97316';
+                    const hasContact = pj.telefone1 || pj.email;
                     const icon = L.divIcon({
                         className: '',
-                        html: `<div class="rs-lead-pin" style="--lead-color:${pinColor}"></div>`,
+                        html: `<div class="rs-lead-pin" style="--lead-color:${pinColor}">${hasContact ? '<div class="rs-pin-badge">\u{1F4DE}</div>' : ''}</div>`,
                         iconSize: [30, 42],
                         iconAnchor: [15, 39],
                         popupAnchor: [0, -38],

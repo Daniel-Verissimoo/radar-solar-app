@@ -157,6 +157,44 @@ def _bairro_polygon_cache(data: dict) -> dict:
     return cache
 
 
+def _ponto_em_poligono(lng: float, lat: float, polygon: list) -> bool:
+    inside = False
+    j = len(polygon) - 1
+    for i in range(len(polygon)):
+        xi, yi = polygon[i]
+        xj, yj = polygon[j]
+        if ((yi > lat) != (yj > lat)) and (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _dentro_municipio(lat: float, lng: float, mun_codigo: str,
+                      municipio_polygons: dict, municipio_centroids: dict) -> tuple[float | None, float | None]:
+    if mun_codigo not in municipio_polygons:
+        return lat, lng
+    geom = municipio_polygons[mun_codigo]
+    coords = _extrair_coords(geom)
+    if not coords:
+        return lat, lng
+    if any(_ponto_em_poligono(lng, lat, poly) for poly in coords):
+        return lat, lng
+    centroide = municipio_centroids.get(mun_codigo)
+    if centroide:
+        return centroide
+    return None, None
+
+
+def _extrair_coords(geometry: dict) -> list[list[tuple[float, float]]]:
+    gtype = geometry.get('type', '')
+    coords = geometry.get('coordinates', [])
+    if gtype == 'Polygon':
+        return [coords[0]] if coords else []
+    if gtype == 'MultiPolygon':
+        return [p[0] for p in coords if p]
+    return []
+
+
 def _random_point_in_bbox(geometry: dict, seed: int) -> tuple[float, float]:
     points = []
     def collect(coords):
@@ -192,6 +230,15 @@ def carregar_pjs_mapa(data: dict) -> list[dict]:
         c.cnpj: c for c in CnpjCache.select()
     }
     bairro_polygons = _bairro_polygon_cache(data)
+    municipio_polygons = {
+        f['properties']['codigo']: f['geometry']
+        for f in data['municipios']['features']
+        if f['geometry']
+    }
+    municipio_centroids = {
+        codigo: _shape_centroid(geom)
+        for codigo, geom in municipio_polygons.items()
+    }
 
     cep_cache = {}
     cep_cache_path = Path(CEP_CACHE_PATH)
@@ -235,16 +282,26 @@ def carregar_pjs_mapa(data: dict) -> list[dict]:
             for key in keys_to_try:
                 entry = bairro_polygons.get((mun_codigo, key))
                 if entry:
+                    centroid = entry['centroid']
                     seed = int(hashlib.md5(inst['codigo'].encode()).hexdigest()[:8], 16)
-                    lat, lng = _random_point_in_bbox(entry['geometry'], seed)
+                    rng = random.Random(seed)
+                    jitter = 0.00015
+                    lat = centroid[0] + rng.uniform(-jitter, jitter)
+                    lng = centroid[1] + rng.uniform(-jitter, jitter)
                     break
         # 4. Fallback: coordenada ANEEL original
         if lat is None:
             inst_lat = inst.get('latitude')
             inst_lng = inst.get('longitude')
             if inst_lat is not None and inst_lng is not None:
-                lat = inst_lat
-                lng = inst_lng
+                lat_valida, lng_valida = _dentro_municipio(
+                    inst_lat, inst_lng, inst.get('municipio_codigo', ''),
+                    municipio_polygons, municipio_centroids,
+                )
+                if lat_valida is not None:
+                    lat, lng = lat_valida, lng_valida
+                else:
+                    lat, lng = inst_lat, inst_lng
         if lat is None or lng is None:
             continue
         if not (RMR_LAT_MIN <= lat <= RMR_LAT_MAX and RMR_LNG_MIN <= lng <= RMR_LNG_MAX):
