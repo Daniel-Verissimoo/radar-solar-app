@@ -1,128 +1,124 @@
-# Radar Solar — Guia para a Empresa
+# Radar Solar — Guia de Uso
 
-## O que é isso?
+## O que é
 
-O Radar Solar é um **site que mostra todas as instalações de energia solar** da Região Metropolitana do Recife. Ele reúne dados públicos da ANEEL (agência de energia elétrica) em um mapa e num sistema de acompanhamento comercial.
-
-Serve para vocês **encontrarem donos de instalações solares** e oferecerem serviços de manutenção, limpeza de painéis, regularização, etc.
+O Radar Solar é uma plataforma web que consolida dados públicos de instalações de geração distribuída de energia solar na Região Metropolitana do Recife, extraídos da base da ANEEL. A ferramenta oferece visualização georreferenciada em mapa e gestão comercial de leads, permitindo identificar potenciais clientes para serviços de operação e manutenção (O&M), regularização e acompanhamento técnico.
 
 ---
 
-## Acessando
+## Acesso
 
 1. Abra o navegador (Chrome, Edge)
-2. Digite: **https://radar-solar-app.onrender.com**
-3. Clique em **"Entrar"** ou vá direto em **/login**
-4. Digite seu **e-mail pessoal** e clique em **"Enviar link de acesso"**
-5. Verifique a **caixa de entrada** do e-mail — você receberá um link mágico
-6. Clique no link — você entra automaticamente
+2. Acesse: **https://radar-solar-app.onrender.com**
+3. Clique em **"Entrar"** ou navegue para **/login**
+4. Informe seu **e-mail corporativo** e clique em **"Enviar link de acesso"**
+5. Verifique a **caixa de entrada** do e-mail informado — você receberá um link de acesso único
+6. Clique no link para autenticar-se automaticamente
 
-> ⚠️ O primeiro acesso do dia pode demorar uns 30 segundos. Depois fica rápido.
+> ⚠️ O primeiro acesso do dia pode demandar até 30 segundos devido ao ciclo de hibernação do servidor. Acessos subsequentes são imediatos.
 
-**Cada pessoa usa o próprio e-mail** — os 3 (você, o sócio e o estagiário) criam suas contas separadamente.
+**Cada usuário utiliza o próprio e-mail** para criar sua conta individual.
 
 ---
 
-## Tela principal — Mapa
+## Mapa Interativo
 
-Ao entrar, você vê um **mapa da Região Metropolitana do Recife** com vários pins laranja.
+Ao autenticar-se, a tela principal exibe o **mapa da Região Metropolitana do Recife** com marcadores laranja.
 
-![Mapa com pins]
+**O que representam os marcadores?**
+São pessoas jurídicas (PJs) que possuem instalações de geração solar registradas na ANEEL. Cada marcador corresponde a um **cliente em potencial**.
 
-**O que são os pins laranja?**
-São empresas (PJs) que têm instalação de energia solar. Cada pin é um possível **cliente em potencial**.
+**Marcador com 📞** → telefone ou e-mail de contato disponível
+**Marcador sem 📞** → dados de contato ainda não localizados
 
-**Pin com 📞** → tem telefone ou e-mail de contato disponível
-**Pin sem 📞** → não encontramos contato ainda
+**Navegação no mapa:**
 
-**Como usar o mapa:**
+1. **Arraste** o mapa com o mouse para navegar
+2. **Aproxime/afaste** com a roda do mouse ou botões +/- no canto
+3. **Clique em um marcador laranja** para exibir:
 
-1. **Navegue** arrastando o mapa com o mouse
-2. **Aproxime** com a rodinha do mouse ou os botões +/-
-3. **Clique num pin laranja** → abre uma janelinha com:
-
-   - Nome da empresa
+   - Razão social
    - CNPJ
-   - Endereço
-   - Data da instalação
-   - Quantos painéis e potência
-   - Telefone (se tiver)
-   - E-mail (se tiver)
+   - Endereço completo
+   - Data de conexão da instalação
+   - Quantidade de módulos e potência instalada (kW)
+   - Telefone (quando disponível)
+   - E-mail (quando disponível)
    - Botão **"Capturar lead"**
 
-**Capturar lead** = salvar esse cliente no seu Kanban (quadro de vendas)
+**Capturar lead** = registrar o cliente potencial no quadro de gestão comercial (Kanban) para acompanhamento.
 
 ---
 
-## Kanban — Quadro de Vendas
+## Kanban — Gestão de Leads
 
-No menu, clique em **"Leads"** ou **"Kanban"**. Você verá um quadro dividido em 3 colunas:
+No menu lateral, clique em **"Leads"** ou **"Kanban"**. O quadro é organizado em três colunas:
 
-| Coluna | Significado |
+| Coluna | Finalidade |
 |---|---|
-| **🆕 Novo** | Leads que você capturou do mapa mas ainda não teve contato |
-| **📞 Em Contato** | Clientes com quem você já está falando |
-| **✅ Concluído** | Clientes que fecharam serviço |
+| **🆕 Novo** | Leads capturados do mapa que ainda não foram contactados |
+| **📞 Em Contato** | Clientes com os quais há negociação em andamento |
+| **✅ Concluído** | Clientes que contrataram serviço |
 
-**Como usar:**
+**Fluxo de trabalho:**
 
 1. Clique em **"Novo Lead"** no canto superior direito
-2. Preencha: nome do contato, telefone, e-mail, descrição do serviço
-3. Clique em **"Criar Lead"** — ele aparece na coluna **Novo**
-4. Quando entrar em contato, **arraste** (ou clique em **Mover → Em Contato**)
-5. Quando fechar, **mova para Concluído**
+2. Preencha os campos: nome do contato, telefone, e-mail, descrição do serviço
+3. Clique em **"Criar Lead"** — o registro é inserido na coluna **Novo**
+4. Ao iniciar o contato, utilize o botão **Mover → Em Contato**
+5. Após fechamento, mova para **Concluído**
 
-**Dica:** O botão **"Instalação"** (ícone ☀️) em cada lead mostra os dados técnicos da instalação solar (potência, módulos, fabricante, data de conexão, código ANEEL) — útil pra já saber o porte do cliente na hora de negociar.
+O botão **"Instalação"** (ícone ☀️) exibe os dados técnicos completos da usina (potência, módulos, fabricantes, data de conexão, código ANEEL), permitindo avaliar o porte do cliente durante a negociação.
 
 ---
 
 ## Perfil da Empresa
 
-No menu, clique em **"Perfil"** para ver e editar os dados da sua empresa integradora:
+No menu, clique em **"Perfil"** para gerenciar os dados cadastrais:
 
-- Nome da empresa
+- Razão social
 - CNPJ
-- Telefone
+- Telefone de contato
 - Endereço
-- **Região de atendimento** (quais cidades vocês atendem)
+- **Região de atendimento** — cidades onde a empresa atua
 
 ---
 
-## Dicas Rápidas
+## Referência Rápida
 
-| Ação | Como fazer |
+| Ação | Procedimento |
 |---|---|
-| **Ver cliente no mapa** | Vá no mapa, clique no pin |
-| **Salvar cliente para contato** | Clique em "Capturar lead" no pin |
-| **Ver leads salvos** | Menu → Kanban |
-| **Mover lead de fase** | Kanban → clicar no lead → Mover |
-| **Editar lead** | Kanban → clicar no lead → Editar |
-| **Sair** | Menu → Sair |
+| **Visualizar cliente no mapa** | Acesse o mapa e clique no marcador |
+| **Registrar cliente para acompanhamento** | Clique em "Capturar lead" no marcador |
+| **Acompanhar leads registrados** | Menu → Kanban |
+| **Alterar fase do lead** | Kanban → clique no lead → Mover |
+| **Editar dados do lead** | Kanban → clique no lead → Editar |
+| **Encerrar sessão** | Menu → Sair |
 
 ---
 
-## Problemas comuns
+## Observações
 
-| Problema | Solução |
+| Situação | Conduta |
 |---|---|
-| **"Limite de envio atingido"** | O Firebase grátis permite 10 e-mails por dia. Se bater, tenta de novo no dia seguinte |
-| **Site demora a abrir** | É normal no primeiro acesso do dia (~30s). Depois fica rápido |
-| **Mapa vazio** | Pode ser que os dados ANEEL estejam desatualizados. Peça pro [Nome] rodar a atualização |
-| **Esqueci o link de acesso** | Volte em /login e peça outro link |
+| **"Limite de envio atingido"** | A camada gratuita do Firebase permite 10 envios de e-mail por dia. Caso atinja o limite, aguarde até o dia seguinte |
+| **Tempo de carregamento inicial** | Normal no primeiro acesso diário (~30s). A plataforma retoma a velocidade após o primeiro carregamento |
+| **Mapa sem dados** | Os dados ANEEL podem estar desatualizados. Recomenda-se executar o script de atualização mensal |
+| **Link de acesso perdido** | Retorne à página /login e solicite um novo link |
 
 ---
 
-## Uma vez por mês: atualizar dados
+## Atualização Mensal de Dados
 
-Os dados da ANEEL são atualizados mensalmente pelo governo. Para o Radar Solar ter os clientes mais recentes, alguém precisa:
+A base ANEEL é atualizada mensalmente. Para manter o Radar Solar com dados recentes, execute mensalmente:
 
-1. Abrir a pasta do projeto no computador
-2. Dar dois cliques em `scripts/atualizar_dados.bat`
-3. Aguardar 5-10 minutos
-4. Seguir as instruções na tela para enviar pro GitHub
+1. Acesse a pasta do projeto no computador onde o sistema está instalado
+2. Execute o arquivo `scripts/atualizar_dados.bat` (clique duplo)
+3. Aguarde o processamento (aproximadamente 5 a 10 minutos)
+4. Siga as instruções exibidas ao final para publicar as alterações no repositório
 
-> Perde uns 10 minutinhos por mês, mas mantém o site sempre com dados frescos.
+> A atualização mensal consome aproximadamente 10 minutos e garante que a plataforma reflita os dados mais recentes disponibilizados pela ANEEL.
 
 ---
 
-**Qualquer dúvida, me chama!** 🚀
+*Documento de uso da plataforma Radar Solar.*
