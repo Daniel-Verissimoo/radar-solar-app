@@ -1,0 +1,32 @@
+name: Backup semanal do banco SQLite
+
+on:
+  schedule:
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar banco do Render
+        run: |
+          curl -s -o "radarsolar-$(date +%Y%m%d).db" \
+            -H "Accept: application/octet-stream" \
+            "https://radar-solar-app.onrender.com/api/backup?token=${{ secrets.RADAR_SOLAR_STORAGE_SECRET }}"
+
+      - name: Verificar se o download foi bem-sucedido
+        run: |
+          if [ ! -s "radarsolar-$(date +%Y%m%d).db" ]; then
+            echo "Falha no download do banco"
+            exit 1
+          fi
+
+      - name: Fazer upload como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: radarsolar-$(date +%Y%m%d)-backup
+          path: radarsolar-$(date +%Y%m%d).db
+          retention-days: 90

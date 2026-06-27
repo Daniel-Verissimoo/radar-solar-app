@@ -57,6 +57,28 @@ app.add_static_files('/assets', str(ASSETS_DIR))
 app.add_static_files('/empresa/static', str(CURRENT_DIR / 'ui' / 'pages' / 'empresa' / 'static'))
 log_ok('Arquivos estaticos registrados: /assets, /demo/static')
 
+log_info('Registrando rota de backup...')
+_backup_secret = os.getenv('RADAR_SOLAR_STORAGE_SECRET', '')
+
+@app.get('/api/backup')
+async def api_backup(token: str = ''):
+    if not _backup_secret or token != _backup_secret:
+        return JSONResponse({'error': 'Nao autorizado'}, status_code=401)
+    from pathlib import Path
+    db_path = Path(__file__).resolve().parent.parent / 'data' / 'radarsolar.db'
+    if not db_path.exists():
+        return JSONResponse({'error': 'Banco nao encontrado'}, status_code=404)
+    from fastapi.responses import Response as FastResponse
+    data = db_path.read_bytes()
+    return FastResponse(
+        data,
+        media_type='application/octet-stream',
+        headers={
+            'Content-Disposition': f'attachment; filename="radarsolar-{time.strftime("%Y%m%d")}.db"',
+            'Content-Length': str(len(data)),
+        },
+    )
+
 log_separador()
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
