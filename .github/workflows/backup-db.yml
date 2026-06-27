@@ -2,7 +2,7 @@ name: Backup semanal do banco SQLite
 
 on:
   schedule:
-    - cron: '0 8 * * 0'
+    - cron: '0 10 * * 0'
   workflow_dispatch:
 
 jobs:
