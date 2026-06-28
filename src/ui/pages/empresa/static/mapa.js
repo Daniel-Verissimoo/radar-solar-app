@@ -682,7 +682,7 @@
                 });
             }
 
-            let pjVisible = true;
+            let pjVisible = false;
 
             function addLeadLegend() {
                 if (!(data.leads || []).length) return;
@@ -738,8 +738,7 @@
                             }
                             pjBtn.textContent = pjVisible ? 'Ocultar empresas' : 'Mostrar empresas';
                         });
-                        pjLayer.addTo(map);
-                        pjBtn.textContent = 'Ocultar empresas';
+                        pjBtn.textContent = 'Mostrar empresas';
                         container.appendChild(pjBtn);
                     }
 
