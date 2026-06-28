@@ -285,9 +285,8 @@ def carregar_pjs_mapa(data: dict) -> list[dict]:
                     centroid = entry['centroid']
                     seed = int(hashlib.md5(inst['codigo'].encode()).hexdigest()[:8], 16)
                     rng = random.Random(seed)
-                    jitter = 0.00015
-                    lat = centroid[0] + rng.uniform(-jitter, jitter)
-                    lng = centroid[1] + rng.uniform(-jitter, jitter)
+                    lat = centroid[0] + rng.uniform(-0.0006, 0.0006)
+                    lng = centroid[1] + rng.uniform(-0.0006, 0.0006)
                     break
         # 4. Fallback: coordenada ANEEL original
         if lat is None:
