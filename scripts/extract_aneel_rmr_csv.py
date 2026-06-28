@@ -10,8 +10,8 @@ import pandas as pd
 from src.utils import log_info, log_dados, log_ok
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-ANEEL_RAW_DIR = BASE_DIR / 'data' / 'raw' / 'aneel'
-OUTPUT_DIR = BASE_DIR / 'data' / 'processed' / 'aneel'
+ANEEL_RAW_DIR = BASE_DIR / 'data' / 'data' / 'raw' / 'aneel'
+OUTPUT_DIR = BASE_DIR / 'data' / 'data' / 'processed' / 'aneel'
 
 EMPREENDIMENTOS_ZIP = ANEEL_RAW_DIR / 'empreendimento-geracao-distribuida.zip'
 INFO_TECNICA_CSV = ANEEL_RAW_DIR / 'empreendimento-gd-informacoes-tecnicas-fotovoltaica.csv'

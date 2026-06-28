@@ -19,9 +19,9 @@ import pandas as pd
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-RAW_DIR = BASE_DIR / 'data' / 'raw'
+RAW_DIR = BASE_DIR / 'data' / 'data' / 'raw'
 ANEEL_RAW_DIR = RAW_DIR / 'aneel'
-PROCESSED_DIR = BASE_DIR / 'data' / 'processed' / 'aneel'
+PROCESSED_DIR = BASE_DIR / 'data' / 'data' / 'processed' / 'aneel'
 MANIFEST_PATH = ANEEL_RAW_DIR / 'manifest.json'
 
 RMR_MUNICIPIOS = {

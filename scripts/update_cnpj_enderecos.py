@@ -19,8 +19,8 @@ from src.models import CnpjCache
 from src.utils import log_info, log_ok, log_aviso, log_erro, log_dados, log_separador
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-EMPREENDIMENTOS_CSV = BASE_DIR / 'data' / 'processed' / 'aneel' / 'empreendimento-geracao-distribuida-rmr.csv'
-PARQUET_PATH = BASE_DIR / 'data' / 'processed' / 'aneel' / 'rmr_instalacoes.parquet'
+EMPREENDIMENTOS_CSV = BASE_DIR / 'data' / 'data' / 'processed' / 'aneel' / 'empreendimento-geracao-distribuida-rmr.csv'
+PARQUET_PATH = BASE_DIR / 'data' / 'data' / 'processed' / 'aneel' / 'rmr_instalacoes.parquet'
 
 CNPJA_DELAY_SECONDS = 12.5
 GEOCODING_DELAY = 1.1
