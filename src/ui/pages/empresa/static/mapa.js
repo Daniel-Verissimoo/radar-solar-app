@@ -632,7 +632,7 @@
                     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
                     const captured = capturedCnpjs.has(pj.cnpj);
                     const pinColor = captured ? '#16a34a' : '#f97316';
-                    const hasContact = pj.telefone1 || pj.email;
+                    const hasContact = pj.telefone1 || pj.telefone2 || pj.email;
                     const icon = L.divIcon({
                         className: '',
                         html: `<div class="rs-lead-pin" style="--lead-color:${pinColor}">${hasContact ? '<div class="rs-pin-badge">\u{1F4DE}</div>' : ''}</div>`,
@@ -682,7 +682,7 @@
                 });
             }
 
-            let pjVisible = false;
+            let pjVisible = true;
 
             function addLeadLegend() {
                 if (!(data.leads || []).length) return;
@@ -738,7 +738,8 @@
                             }
                             pjBtn.textContent = pjVisible ? 'Ocultar empresas' : 'Mostrar empresas';
                         });
-                        pjBtn.textContent = 'Mostrar empresas';
+                        pjLayer.addTo(map);
+                        pjBtn.textContent = 'Ocultar empresas';
                         container.appendChild(pjBtn);
                     }
 
