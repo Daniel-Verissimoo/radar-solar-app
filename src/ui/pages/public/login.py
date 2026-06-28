@@ -111,7 +111,7 @@ def render_login(selected_profile: str = 'customer') -> None:
                                 ui.label(data['helper']).classes('text-sm text-slate-600 leading-6')
                                 tab.on('click', lambda _=None, key=key: set_profile(key))
                     ui.label('Informe o e-mail para receber o link de acesso').classes('text-sm font-semibold text-slate-500 pt-1')
-                    email = ui.input('').classes('w-full')
+                    email = ui.input('').classes('w-full').on('keydown.enter', lambda: send_magic_link())
                     email.props('outlined')
                     ui.label('Você receberá um link seguro para entrar sem senha.').classes(
                         'text-sm text-slate-500 leading-6'
