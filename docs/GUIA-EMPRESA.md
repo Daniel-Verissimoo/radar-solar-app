@@ -103,21 +103,35 @@ No menu, clique em **"Perfil"** para gerenciar os dados cadastrais:
 |---|---|
 | **"Limite de envio atingido"** | A camada gratuita do Firebase permite 10 envios de e-mail por dia. Caso atinja o limite, aguarde até o dia seguinte |
 | **Tempo de carregamento inicial** | Normal no primeiro acesso diário (~30s). A plataforma retoma a velocidade após o primeiro carregamento |
-| **Mapa sem dados** | Os dados ANEEL podem estar desatualizados. Recomenda-se executar o script de atualização mensal |
+| **Mapa sem dados ou pins aglomerados** | Execute `scripts/atualizar_dados.bat` para baixar dados ANEEL recentes e atualizar a localização dos pins |
 | **Link de acesso perdido** | Retorne à página /login e solicite um novo link |
 
 ---
 
 ## Atualização Mensal de Dados
 
-A base ANEEL é atualizada mensalmente. Para manter o Radar Solar com dados recentes, execute mensalmente:
+A base ANEEL é atualizada mensalmente. Para manter o Radar Solar com dados recentes, execute:
 
-1. Acesse a pasta do projeto no computador onde o sistema está instalado
-2. Execute o arquivo `scripts/atualizar_dados.bat` (clique duplo)
-3. Aguarde o processamento (aproximadamente 5 a 10 minutos)
-4. Siga as instruções exibidas ao final para publicar as alterações no repositório
+1. Acesse a pasta do projeto no computador
+2. Dê **clique duplo** em `scripts/atualizar_dados.bat`
+3. Agora ele tem **5 etapas** (era 3):
 
-> A atualização mensal consome aproximadamente 10 minutos e garante que a plataforma reflita os dados mais recentes disponibilizados pela ANEEL.
+   | Etapa | O que faz | Duração estimada |
+   |---|---|---|
+   | 1/5 | Baixa dados ANEEL mais recentes | ~2 min |
+   | 2/5 | Extrai lista de CNPJs | ~1 min |
+   | **3/5** | **Busca telefone/email de cada empresa** (via CNPJa) | **2-3 horas na 1ª vez, segundos depois** |
+   | 4/5 | Regenera o mapa | ~3 min |
+   | 5/5 | Corrige posição dos pins por CEP | ~2 min |
+
+4. Ao final, siga as instruções para publicar as alterações
+
+> ⚠️ **Na primeira execução**, a etapa 3/5 consulta uma API externa para cada empresa (limitada a ~13s por consulta). Pode levar **2 a 3 horas**. Isso é **normal e único** — nas execuções seguintes, só processa empresas novas (segundos).
+>
+> **O que muda com a etapa 3/5?**
+> - Pins que tinham apenas centroide do bairro passam a ter coordenada exata do endereço da empresa
+> - O **selo 📞** (telefone/email) aparece nos marcadores quando disponível
+> - Os dados ficam salvos no banco permanente e não se perdem em atualizações futuras
 
 ---
 
