@@ -644,7 +644,6 @@
                         icon,
                         pane: 'leadPane',
                         zIndexOffset: 9000,
-                        bubblingMouseEvents: false,
                     });
                     const logradouro = pj.logradouro
                         ? `${escapeHtml(String(pj.logradouro).toUpperCase())}${pj.numero ? ', ' + escapeHtml(String(pj.numero).toUpperCase()) : ''}`
@@ -677,7 +676,6 @@
                         ${btnHtml ? '<div style="border-top:1px solid #e2e8f0;margin:7px 0"></div>' + btnHtml : ''}
                         </div>
                     `, { autoPan: true, keepInView: true, closeButton: true, maxWidth: 380, className: 'rs-pj-popup' });
-                    marker.on('click', function () { this.openPopup(); });
                     marker.addTo(pjLayer);
                 });
             }
