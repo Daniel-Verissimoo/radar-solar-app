@@ -107,10 +107,10 @@
             map.getPane('leadPane').style.pointerEvents = 'auto';
 
             map.on('popupopen', function (e) {
-                if (e.popup._source) e.popup._source.setZIndexOffset(99999);
+                if (e.popup._source && typeof e.popup._source.setZIndexOffset === 'function') e.popup._source.setZIndexOffset(99999);
             });
             map.on('popupclose', function (e) {
-                if (e.popup._source) e.popup._source.setZIndexOffset(9000);
+                if (e.popup._source && typeof e.popup._source.setZIndexOffset === 'function') e.popup._source.setZIndexOffset(9000);
             });
 
             const leadStatusColors = {
