@@ -147,6 +147,8 @@ def main() -> int:
 
     # Bairros: nome normalizado -> metricas (por codigo municipio)
     # Agregar qtd_modulos dos bairros a partir do df_instalacoes
+    if 'bairro_estimado' not in df_instalacoes.columns:
+        df_instalacoes['bairro_estimado'] = 'Nao identificado'
     bairro_modulos = (
         df_instalacoes.groupby(['municipio_norm', 'bairro_estimado'])['qtd_modulos']
         .sum()

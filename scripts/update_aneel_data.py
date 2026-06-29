@@ -410,6 +410,10 @@ def enrich_with_bairro(df: pd.DataFrame) -> pd.DataFrame:
 
 def write_parquets(instalacoes: pd.DataFrame) -> None:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+
+    if 'bairro_estimado' not in instalacoes.columns:
+        instalacoes['bairro_estimado'] = 'Nao identificado'
+
     instalacoes_path = PROCESSED_DIR / 'rmr_instalacoes.parquet'
     municipios_path = PROCESSED_DIR / 'rmr_municipios.parquet'
     bairros_path = PROCESSED_DIR / 'rmr_bairros.parquet'
