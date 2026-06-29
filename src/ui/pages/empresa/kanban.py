@@ -389,7 +389,7 @@ def _abrir_edicao_contato(cnpj: str, parent_dialog: ui.dialog) -> None:
         email_input = ui.input('E-mail', value=cache.email or '').classes('w-full')
         with ui.row().classes('w-full justify-end gap-2'):
             ui.button('Cancelar', on_click=edit_dialog.close).props('flat')
-            async def _salvar():
+            def _salvar():
                 v1 = tel1_input.value.strip() or None
                 v2 = tel2_input.value.strip() or None
                 ve = email_input.value.strip() or None
