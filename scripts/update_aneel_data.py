@@ -197,10 +197,7 @@ def update_resource(name: str, config: dict, manifest: dict, force: bool = False
     destination = ANEEL_RAW_DIR / config['filename']
 
     log_info(f'{name}: verificando versao remota')
-    metadata = fetch_remote_metadata(name)
-    if metadata and sha256_local == metadata.get('sha256'):
-        log_info(f'{name}: sem alteracao pelos metadados remotos; download ignorado')
-        return 0
+    metadata = fetch_remote_metadata(config['url'])
 
     if force:
         log_info(f'{name}: download forcado')
@@ -218,7 +215,7 @@ def update_resource(name: str, config: dict, manifest: dict, force: bool = False
             log_info(f'{name}: conteudo identico pelo sha256; arquivo local mantido')
             changed = False
         else:
-            shutil.move(str(tmp_path), str(destination))
+            shutil.move(str(temp_path), str(destination))
             log_ok(f'{name}: arquivo atualizado em {destination.relative_to(BASE_DIR)}')
             changed = True
 
