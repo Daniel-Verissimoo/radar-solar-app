@@ -35,7 +35,8 @@ São pessoas jurídicas (PJs) que possuem instalações de geração solar regis
 
 1. **Arraste** o mapa com o mouse para navegar
 2. **Aproxime/afaste** com a roda do mouse ou botões +/- no canto
-3. **Clique em um marcador laranja** para exibir:
+3. **Clique em um município** para ver a lista de instalações na tabela abaixo do mapa, com colunas de **Telefone** e **E-mail** quando disponíveis
+4. **Clique em um marcador laranja** para exibir:
 
    - Razão social
    - CNPJ
@@ -44,7 +45,10 @@ São pessoas jurídicas (PJs) que possuem instalações de geração solar regis
    - Quantidade de módulos e potência instalada (kW)
    - Telefone (quando disponível)
    - E-mail (quando disponível)
-   - Botão **"Capturar lead"**
+    - Botão **"Capturar lead"**
+    - Botão **"Adicionar contato"** / **"Editar contato"** (preencha telefone e email manualmente)
+
+  > **Dica**: Se o marcador não tem 📞, você mesmo pode adicionar o contato — clique no marcador, depois em "Adicionar contato".
 
 **Capturar lead** = registrar o cliente potencial no quadro de gestão comercial (Kanban) para acompanhamento.
 
@@ -68,7 +72,7 @@ No menu lateral, clique em **"Leads"** ou **"Kanban"**. O quadro é organizado e
 4. Ao iniciar o contato, utilize o botão **Mover → Em Contato**
 5. Após fechamento, mova para **Concluído**
 
-O botão **"Instalação"** (ícone ☀️) exibe os dados técnicos completos da usina (potência, módulos, fabricantes, data de conexão, código ANEEL), permitindo avaliar o porte do cliente durante a negociação.
+O botão **"Instalação"** (ícone ☀️) exibe os dados técnicos completos da usina (potência, módulos, fabricantes, data de conexão, código ANEEL) e também o **botão "Editar contato"** para preencher ou corrigir telefone e e-mail da empresa.
 
 ---
 
@@ -93,6 +97,8 @@ No menu, clique em **"Perfil"** para gerenciar os dados cadastrais:
 | **Acompanhar leads registrados** | Menu → Kanban |
 | **Alterar fase do lead** | Kanban → clique no lead → Mover |
 | **Editar dados do lead** | Kanban → clique no lead → Editar |
+| **Adicionar contato de empresa** | Mapa → clique no pin → "Adicionar contato" |
+| **Editar contato de empresa** | Kanban → lead → Instalação → "Editar contato" |
 | **Encerrar sessão** | Menu → Sair |
 
 ---
