@@ -9526,5 +9526,35 @@
     "latitude": -30.208947,
     "longitude": -57.5505128,
     "logradouro": ""
+  },
+  "50850010": {
+    "cep": "50850010",
+    "latitude": -8.0800755,
+    "longitude": -34.9155859,
+    "logradouro": "Rua Doutor Odilon Lima"
+  },
+  "51350420": {
+    "cep": "51350420",
+    "latitude": -8.1127877,
+    "longitude": -34.9241706,
+    "logradouro": "Rua Adolfo Faro"
+  },
+  "53540240": {
+    "cep": "53540240",
+    "latitude": -7.9227301,
+    "longitude": -34.9094112,
+    "logradouro": "Avenida C"
+  },
+  "53615170": {
+    "cep": "53615170",
+    "latitude": -7.8143283,
+    "longitude": -34.89344,
+    "logradouro": "Rua Criciúma"
+  },
+  "54230285": {
+    "cep": "54230285",
+    "latitude": -8.135866,
+    "longitude": -34.9577378,
+    "logradouro": "Rua Manoel Botelho de Oliveira"
   }
 }

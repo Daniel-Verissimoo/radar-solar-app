@@ -352,6 +352,7 @@ def main() -> int:
 
     # ── 9. SALVAR ────────────────────────────────────────────────────────────
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    GEOJSON_PATH.unlink(missing_ok=True)
     with open(GEOJSON_PATH, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
