@@ -13,6 +13,8 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from src.utils import log_info, log_ok, log_aviso, log_erro, log_dados, log_separador
 
 import pandas as pd
