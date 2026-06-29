@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import zipfile
 import shutil
@@ -269,13 +270,25 @@ def read_info_tecnica_for(codigos: set[str], chunksize: int = 250_000) -> pd.Dat
         raise FileNotFoundError(f'Arquivo ANEEL ausente: {csv_path}')
 
     frames: list[pd.DataFrame] = []
+
+    with open(csv_path, 'rb') as f:
+        magic = f.read(4)
+
+    csv_file: str | io.TextIOWrapper
+    if magic[:2] == b'PK':
+        with zipfile.ZipFile(csv_path) as z:
+            csv_name = z.namelist()[0]
+            csv_file = io.TextIOWrapper(z.open(csv_name), encoding='latin1')
+    else:
+        csv_file = str(csv_path)
+
     reader = pd.read_csv(
-        csv_path,
+        csv_file,
         sep=';',
         dtype=str,
         usecols=INFO_TECNICA_COLS,
         chunksize=chunksize,
-        encoding='latin1',
+        encoding='latin1' if isinstance(csv_file, str) else None,
     )
     for index, chunk in enumerate(reader, start=1):
         filtered = chunk[chunk['CodGeracaoDistribuida'].isin(codigos)].copy()
