@@ -432,7 +432,10 @@ def write_parquets(instalacoes: pd.DataFrame) -> None:
     municipios.to_parquet(municipios_path, index=False)
 
     bairros_base = instalacoes.copy()
-    bairros_base['bairro_estimado'] = bairros_base['bairro_estimado'].fillna('Nao identificado')
+    if 'bairro_estimado' in bairros_base.columns:
+        bairros_base['bairro_estimado'] = bairros_base['bairro_estimado'].fillna('Nao identificado')
+    else:
+        bairros_base['bairro_estimado'] = 'Nao identificado'
     bairros = (
         bairros_base.groupby(['uf', 'municipio', 'bairro_estimado'], dropna=False)
         .agg(
