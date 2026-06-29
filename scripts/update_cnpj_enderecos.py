@@ -163,6 +163,8 @@ def atualizar_parquet() -> None:
         return
 
     df = pd.read_parquet(PARQUET_PATH)
+    if 'bairro_estimado' not in df.columns:
+        df['bairro_estimado'] = ''
     mask_pj = df['tipo_consumidor'] == 'PJ'
     atualizados_cep = 0
     atualizados_bairro = 0
