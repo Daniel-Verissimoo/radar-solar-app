@@ -222,9 +222,9 @@ def update_resource(name: str, config: dict, manifest: dict, force: bool = False
         resources[name] = {
             'url': config['url'],
             'filename': config['filename'],
-            'etag': remote.etag if remote else None,
-            'last_modified': remote.last_modified if remote else None,
-            'content_length': remote.content_length if remote else None,
+            'etag': metadata.etag if metadata else None,
+            'last_modified': metadata.last_modified if metadata else None,
+            'content_length': metadata.content_length if metadata else None,
             'sha256': new_sha256,
             'downloaded_at': utc_now_iso(),
             'changed': changed,
