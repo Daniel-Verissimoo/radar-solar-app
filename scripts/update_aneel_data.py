@@ -550,7 +550,7 @@ def main() -> int:
         return 0
 
     if args.process_only:
-        process_aneel_data(args.chunksize, args.force_process)
+        process_aneel_data(force_process=args.force_process)
         return 0
 
     manifest = load_manifest()
@@ -569,7 +569,7 @@ def main() -> int:
     }
     save_manifest(manifest)
     if any_changed or args.force_process or not processed_outputs_exist():
-        process_aneel_data(args.chunksize, args.force_process)
+        process_aneel_data(force_process=args.force_process)
     else:
         log_info('Parquets ja existem e dados remotos nao mudaram; processamento ignorado')
     log_separador(f'Concluido. Houve atualizacao: {any_changed}')
