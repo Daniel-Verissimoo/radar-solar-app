@@ -463,13 +463,13 @@ def write_parquets(instalacoes: pd.DataFrame) -> None:
         log_info(f'  {path.relative_to(BASE_DIR)} ({tamanho_mb:.2f} MB)')
 
 
-def process_aneel_data() -> None:
+def process_aneel_data(chunksize: int = 200_000, force_process: bool = False) -> None:
     log_info('Processando empreendimentos ANEEL para PE/RMR...')
-    empreendimentos = read_empreendimentos_rmr(args.chunksize, args.force_process)
+    empreendimentos = read_empreendimentos_rmr(chunksize, force_process)
     log_dados('empreendimentos RMR processados', len(empreendimentos))
 
     log_info('Processando informacoes tecnicas fotovoltaicas...')
-    info_tecnica = read_info_tecnica_rmr(args.chunksize, args.force_process)
+    info_tecnica = read_info_tecnica_rmr(chunksize, force_process)
     log_dados('info tecnica RMR processados', len(info_tecnica))
 
     joined = empreendimentos.merge(
@@ -550,7 +550,7 @@ def main() -> int:
         return 0
 
     if args.process_only:
-        process_aneel_data()
+        process_aneel_data(args.chunksize, args.force_process)
         return 0
 
     manifest = load_manifest()
@@ -569,7 +569,7 @@ def main() -> int:
     }
     save_manifest(manifest)
     if any_changed or args.force_process or not processed_outputs_exist():
-        process_aneel_data()
+        process_aneel_data(args.chunksize, args.force_process)
     else:
         log_info('Parquets ja existem e dados remotos nao mudaram; processamento ignorado')
     log_separador(f'Concluido. Houve atualizacao: {any_changed}')
