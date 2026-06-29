@@ -386,7 +386,11 @@ def normalize_joined_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def enrich_with_bairro(df: pd.DataFrame) -> pd.DataFrame:
-    lookup = build_cep_bairro_lookup()
+    try:
+        lookup = build_cep_bairro_lookup()
+    except Exception:
+        log_aviso('DNE ausente — bairros nao serao enriquecidos por CEP')
+        return df
     unique_prefixes = sorted(prefix for prefix in df['cep_prefixo'].dropna().unique() if prefix)
     resolved = {prefix: resolve_bairro_for_prefix(prefix, lookup) for prefix in unique_prefixes}
     df['bairro_estimado'] = df['cep_prefixo'].map(lambda prefix: resolved.get(prefix, (None, None))[0])
@@ -495,13 +499,27 @@ def validate_supporting_raw_data() -> bool:
 
     log_info('Validando bases auxiliares...')
     all_ok = True
-    for label, path in checks:
+    obrigatorios = [
+        ('IBGE municipios PE', ibge_dir / 'PE_Municipios_2024' / 'PE_Municipios_2024.shp'),
+        ('IBGE bairros PE', ibge_dir / 'PE_bairros_CD2022' / 'PE_bairros_CD2022.shp'),
+    ]
+    opcionais = [
+        ('Correios DNE delimitado', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_BAIRRO.TXT'),
+        ('Correios DNE faixas bairro', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_FAIXA_BAIRRO.TXT'),
+        ('Correios DNE localidades', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_LOCALIDADE.TXT'),
+    ]
+    for label, path in obrigatorios:
         exists = path.exists()
         all_ok = all_ok and exists
         if exists:
             log_ok(f'{label}: {path.relative_to(BASE_DIR)}')
         else:
-            log_aviso(f'{label}: AUSENTE ({path.relative_to(BASE_DIR)})')
+            log_erro(f'{label}: AUSENTE ({path.relative_to(BASE_DIR)})')
+    for label, path in opcionais:
+        if path.exists():
+            log_ok(f'{label}: {path.relative_to(BASE_DIR)}')
+        else:
+            log_aviso(f'{label}: AUSENTE ({path.relative_to(BASE_DIR)}) — bairros serao estimados por IBGE')
     return all_ok
 
 
