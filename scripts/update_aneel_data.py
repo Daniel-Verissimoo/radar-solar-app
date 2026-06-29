@@ -171,7 +171,7 @@ def download_to_temp(url: str) -> Path:
     temp.close()
 
     try:
-        with urlopen(request, timeout=120) as response, temp_path.open('wb') as file:
+        with urlopen(request, timeout=300) as response, temp_path.open('wb') as file:
             shutil.copyfileobj(response, file)
     except Exception:
         temp_path.unlink(missing_ok=True)
