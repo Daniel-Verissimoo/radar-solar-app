@@ -473,6 +473,7 @@ def write_parquets(instalacoes: pd.DataFrame) -> None:
     serie['potencia_acumulada_kw'] = serie.groupby('municipio')['potencia_adicionada_kw'].cumsum()
     serie.to_parquet(serie_path, index=False)
 
+    parquet_paths = [instalacoes_path, municipios_path, bairros_path, equipamentos_path, serie_path]
     log_info('Parquets gerados:')
     for path in parquet_paths:
         tamanho_mb = path.stat().st_size / 1024 / 1024
