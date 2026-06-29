@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import sys
 import unicodedata
 import zipfile
@@ -17,7 +18,7 @@ ANEEL_RAW_DIR = BASE_DIR / 'data' / 'data' / 'raw' / 'aneel'
 OUTPUT_DIR = BASE_DIR / 'data' / 'data' / 'processed' / 'aneel'
 
 EMPREENDIMENTOS_ZIP = ANEEL_RAW_DIR / 'empreendimento-geracao-distribuida.zip'
-INFO_TECNICA_CSV = ANEEL_RAW_DIR / 'empreendimento-gd-informacoes-tecnicas-fotovoltaica.csv'
+INFO_TECNICA_PATH = ANEEL_RAW_DIR / 'empreendimento-gd-informacoes-tecnicas-fotovoltaica.csv'
 
 RMR_EMPREENDIMENTOS_CSV = OUTPUT_DIR / 'empreendimento-geracao-distribuida-rmr.csv'
 RMR_INFO_TECNICA_CSV = OUTPUT_DIR / 'empreendimento-gd-informacoes-tecnicas-fotovoltaica-rmr.csv'
@@ -47,7 +48,7 @@ def normalize_text(value: object) -> str:
 
 
 def ensure_inputs_exist() -> None:
-    missing = [path for path in [EMPREENDIMENTOS_ZIP, INFO_TECNICA_CSV] if not path.exists()]
+    missing = [path for path in [EMPREENDIMENTOS_ZIP, INFO_TECNICA_PATH] if not path.exists()]
     if missing:
         missing_list = '\n'.join(f'- {path.relative_to(BASE_DIR)}' for path in missing)
         raise FileNotFoundError(
@@ -111,7 +112,17 @@ def extract_info_tecnica_rmr(codigos: set[str], chunksize: int, force: bool) -> 
     total = 0
     written_header = False
 
-    reader = pd.read_csv(INFO_TECNICA_CSV, sep=';', dtype=str, chunksize=chunksize, encoding='latin1')
+    with open(INFO_TECNICA_PATH, 'rb') as f:
+        magic = f.read(4)
+
+    csv_src: str | io.TextIOWrapper
+    if magic[:2] == b'PK':
+        with zipfile.ZipFile(INFO_TECNICA_PATH) as z:
+            csv_src = io.TextIOWrapper(z.open(z.namelist()[0]), encoding='latin1')
+    else:
+        csv_src = str(INFO_TECNICA_PATH)
+
+    reader = pd.read_csv(csv_src, sep=';', dtype=str, chunksize=chunksize, encoding='latin1' if isinstance(csv_src, str) else None, on_bad_lines='warn')
     for index, chunk in enumerate(reader, start=1):
         filtered = chunk[chunk['CodGeracaoDistribuida'].isin(codigos)].copy()
         if filtered.empty:
