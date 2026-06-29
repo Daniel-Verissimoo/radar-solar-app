@@ -465,11 +465,12 @@ def write_parquets(instalacoes: pd.DataFrame) -> None:
 
 def process_aneel_data(chunksize: int = 200_000, force_process: bool = False) -> None:
     log_info('Processando empreendimentos ANEEL para PE/RMR...')
-    empreendimentos = read_empreendimentos_rmr(chunksize, force_process)
+    empreendimentos = read_empreendimentos_rmr(chunksize)
     log_dados('empreendimentos RMR processados', len(empreendimentos))
 
+    codigos = set(empreendimentos['CodEmpreendimento'].dropna().unique())
     log_info('Processando informacoes tecnicas fotovoltaicas...')
-    info_tecnica = read_info_tecnica_rmr(chunksize, force_process)
+    info_tecnica = read_info_tecnica_for(codigos, chunksize)
     log_dados('info tecnica RMR processados', len(info_tecnica))
 
     joined = empreendimentos.merge(
