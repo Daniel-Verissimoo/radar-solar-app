@@ -348,23 +348,60 @@ def _render_instalacao_dialog(lead: Lead) -> ui.dialog | None:
                     ui.label(instalacao.modalidade_geracao)
 
         contato = _obter_contato_instalacao(instalacao)
-        if contato:
-            ui.separator()
+        cnpj_inst = None
+        if instalacao.usuario_id:
+            c = Usuario.get_or_none(Usuario.id == instalacao.usuario_id)
+            if c and c.cpf_cnpj:
+                cnpj_inst = ''.join(ch for ch in c.cpf_cnpj if ch.isdigit())
+        ui.separator()
+        with ui.row().classes('w-full items-center justify-between'):
             ui.label('Contato').classes('text-base font-bold')
-            with ui.column().classes('w-full gap-2 text-sm'):
-                if contato.get('telefone1'):
-                    with ui.row().classes('w-full gap-2'):
-                        ui.label('Telefone:').classes('font-semibold text-slate-500 min-w-20')
-                        ui.label(contato['telefone1'])
-                if contato.get('telefone2'):
-                    with ui.row().classes('w-full gap-2'):
-                        ui.label('Tel. 2:').classes('font-semibold text-slate-500 min-w-20')
-                        ui.label(contato['telefone2'])
-                if contato.get('email'):
-                    with ui.row().classes('w-full gap-2'):
-                        ui.label('E-mail:').classes('font-semibold text-slate-500 min-w-20')
-                        ui.label(contato['email'])
+            if cnpj_inst and len(cnpj_inst) == 14:
+                ui.button('Editar contato', icon='edit', on_click=lambda cnpj=cnpj_inst, d=dialog: _abrir_edicao_contato(cnpj, d)).props('flat dense text-primary')
+        with ui.column().classes('w-full gap-2 text-sm'):
+            tel1 = (contato or {}).get('telefone1', '')
+            tel2 = (contato or {}).get('telefone2', '')
+            email = (contato or {}).get('email', '')
+            with ui.row().classes('w-full gap-2'):
+                ui.label('Telefone:').classes('font-semibold text-slate-500 min-w-20')
+                ui.label(tel1 if tel1 else '-').classes('rs-contato-tel1')
+            with ui.row().classes('w-full gap-2'):
+                ui.label('Tel. 2:').classes('font-semibold text-slate-500 min-w-20')
+                ui.label(tel2 if tel2 else '-').classes('rs-contato-tel2')
+            with ui.row().classes('w-full gap-2'):
+                ui.label('E-mail:').classes('font-semibold text-slate-500 min-w-20')
+                ui.label(email if email else '-').classes('rs-contato-email')
     return dialog
+
+
+def _abrir_edicao_contato(cnpj: str, parent_dialog: ui.dialog) -> None:
+    cache = CnpjCache.get_or_none(CnpjCache.cnpj == cnpj)
+    if not cache:
+        ui.notify('CNPJ nao encontrado', type='warning')
+        return
+    with ui.dialog() as edit_dialog, ui.card().classes('p-6 gap-4 min-w-[350px]'):
+        with ui.row().classes('w-full items-center justify-between'):
+            ui.label('Editar contato').classes('text-lg font-bold')
+            ui.button(icon='close', on_click=edit_dialog.close).props('flat dense')
+        ui.separator()
+        tel1_input = ui.input('Telefone 1', value=cache.telefone1 or '').classes('w-full')
+        tel2_input = ui.input('Telefone 2', value=cache.telefone2 or '').classes('w-full')
+        email_input = ui.input('E-mail', value=cache.email or '').classes('w-full')
+        with ui.row().classes('w-full justify-end gap-2'):
+            ui.button('Cancelar', on_click=edit_dialog.close).props('flat')
+            async def _salvar():
+                v1 = tel1_input.value.strip() or None
+                v2 = tel2_input.value.strip() or None
+                ve = email_input.value.strip() or None
+                cache.telefone1 = v1
+                cache.telefone2 = v2
+                cache.email = ve
+                cache.save()
+                ui.notify('Contato atualizado!', type='positive')
+                edit_dialog.close()
+                parent_dialog.close()
+            ui.button('Salvar', on_click=_salvar).props('color=primary')
+        edit_dialog.open()
 
 
 def _render_detalhes_dialog(lead: Lead):

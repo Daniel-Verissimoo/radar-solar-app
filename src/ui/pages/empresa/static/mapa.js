@@ -591,6 +591,7 @@
                 const btn = e.target.closest('.rs-capture-btn');
                 if (!btn) return;
                 e.preventDefault();
+                // ... (capture logic unchanged)
                 try {
                     const data = JSON.parse(btn.dataset.capture);
                     console.log('capturar-lead data:', data.cnpj);
@@ -622,6 +623,73 @@
                     btn.disabled = false;
                     btn.textContent = e.message || 'Erro';
                     btn.style.background = '#dc2626';
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                const popup = e.target.closest('.leaflet-popup');
+                if (!popup) return;
+                const div = popup.querySelector('[class*="rs-contato-"],[class*="rs-edit-contato"]');
+                if (!div) return;
+                const editBtn = e.target.closest('.rs-edit-contato-btn');
+                if (editBtn) {
+                    e.preventDefault();
+                    const container = editBtn.closest('[id^="edit-"]');
+                    if (container) {
+                        container.querySelector('.rs-contato-display').style.display = 'none';
+                        container.querySelector('.rs-contato-edit').style.display = 'block';
+                        editBtn.style.display = 'none';
+                    }
+                }
+                const cancelBtn = e.target.closest('.rs-cancel-edit-contato');
+                if (cancelBtn) {
+                    e.preventDefault();
+                    const container = cancelBtn.closest('[id^="edit-"]');
+                    if (container) {
+                        container.querySelector('.rs-contato-display').style.display = 'block';
+                        container.querySelector('.rs-contato-edit').style.display = 'none';
+                        container.querySelector('.rs-edit-contato-btn').style.display = '';
+                    }
+                }
+                const saveBtn = e.target.closest('.rs-save-contato');
+                if (saveBtn) {
+                    e.preventDefault();
+                    const container = saveBtn.closest('[id^="edit-"]');
+                    if (!container) return;
+                    const tel1 = container.querySelector('.rs-e-tel1').value.trim();
+                    const tel2 = container.querySelector('.rs-e-tel2').value.trim();
+                    const email = container.querySelector('.rs-e-email').value.trim();
+                    const cnpj = container.closest('[id^="edit-"]').id.replace('edit-', '');
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = 'Salvando...';
+                    try {
+                        const r = await fetch('/api/empresa/contato/' + encodeURIComponent(cnpj), {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({ telefone1: tel1 || null, telefone2: tel2 || null, email: email || null }),
+                        });
+                        if (!r.ok) {
+                            const resp = await r.json();
+                            throw new Error(resp.error || 'Erro ao salvar');
+                        }
+                        saveBtn.textContent = 'Salvo!';
+                        saveBtn.style.background = '#16a34a';
+                        setTimeout(() => {
+                            container.querySelector('.rs-contato-display').style.display = 'block';
+                            container.querySelector('.rs-contato-edit').style.display = 'none';
+                            saveBtn.style.background = '#f97316';
+                            saveBtn.textContent = 'Salvar';
+                            saveBtn.disabled = false;
+                            container.querySelector('.rs-edit-contato-btn').style.display = '';
+                            renderPjPins();
+                        }, 800);
+                    } catch (e) {
+                        console.error('Erro ao salvar contato:', e);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Erro';
+                        saveBtn.style.background = '#dc2626';
+                    }
                 }
             });
 
@@ -659,11 +727,13 @@
                     const telefone = pj.telefone1
                         ? `${escapeHtml(pj.telefone1)}${pj.telefone2 ? ' / ' + escapeHtml(pj.telefone2) : ''}`
                         : '-';
+                    const email = pj.email ? escapeHtml(pj.email) : '-';
                     const modulosPotencia = `${Number(pj.qtd_modulos || 0).toLocaleString('pt-BR')} mod / ${Number(pj.potencia_kw || 0).toLocaleString('pt-BR')} kW`;
                     const enderecoCompleto = `${logradouro}, ${cidadeUf}`;
                     const btnHtml = captureBtnHtml(pj.cnpj, pj.titular, enderecoCompleto, pj.telefone1 || '', captured);
+                    const editId = `edit-${pj.cnpj}`;
                     marker.bindPopup(`
-                        <div style="font-size:13px;line-height:1.6">
+                        <div style="font-size:13px;line-height:1.6" id="${escapeHtml(editId)}">
                         <strong>${escapeHtml(pj.codigo)}</strong><br>
                         ${captured ? '<span style="color:#16a34a;font-weight:bold">Ja capturado</span><br>' : ''}
                         <div style="border-top:1px solid #e2e8f0;margin:7px 0"></div>
@@ -675,9 +745,19 @@
                         <strong>Instalação de ${pj.data_instalacao ? escapeHtml(pj.data_instalacao) : '-'}</strong><br>
                         ${modulosPotencia}
                         <div style="border-top:1px solid #e2e8f0;margin:7px 0"></div>
-                        <strong>Contato</strong><br>
-                        Tel.: ${telefone}<br>
-                        E-mail: ${pj.email ? escapeHtml(pj.email) : '-'}
+                        <strong>Contato</strong>
+                        <div class="rs-contato-display">
+                        Tel.: <span class="rs-c-tel">${telefone}</span><br>
+                        E-mail: <span class="rs-c-email">${email}</span>
+                        </div>
+                        <div class="rs-contato-edit" style="display:none">
+                        Tel.1: <input class="rs-e-tel1" value="${escapeHtml(pj.telefone1 || '')}" style="width:100%;margin:2px 0;padding:2px 4px"><br>
+                        Tel.2: <input class="rs-e-tel2" value="${escapeHtml(pj.telefone2 || '')}" style="width:100%;margin:2px 0;padding:2px 4px"><br>
+                        E-mail: <input class="rs-e-email" value="${escapeHtml(pj.email || '')}" style="width:100%;margin:2px 0;padding:2px 4px"><br>
+                        <button class="rs-save-contato" style="background:#f97316;color:white;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;margin-top:4px">Salvar</button>
+                        <button class="rs-cancel-edit-contato" style="background:#94a3b8;color:white;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;margin-top:4px;margin-left:4px">Cancelar</button>
+                        </div>
+                        <button class="rs-edit-contato-btn" style="background:transparent;color:#f97316;border:1px solid #f97316;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:11px;margin-top:4px">${pj.telefone1 || pj.telefone2 || pj.email ? 'Editar contato' : 'Adicionar contato'}</button>
                         ${btnHtml ? '<div style="border-top:1px solid #e2e8f0;margin:7px 0"></div>' + btnHtml : ''}
                         </div>
                     `, { autoPan: true, keepInView: true, closeButton: true, maxWidth: 380, className: 'rs-pj-popup' });

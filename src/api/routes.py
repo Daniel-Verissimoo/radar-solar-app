@@ -1,9 +1,9 @@
-import time, traceback
+import time, traceback, json
 from fastapi import APIRouter, Request as FastAPIRequest, Query
 from fastapi.responses import Response, JSONResponse
 from nicegui import app
 from src.database import db
-from src.models import Lead, LeadLog, Usuario
+from src.models import CnpjCache, Lead, LeadLog, Usuario
 from src.services.geo_service import carregar_geojson_rmr
 from src.ui.pages.empresa.mapa import (
     montar_mapa_json,
@@ -111,6 +111,37 @@ async def api_empresa_capturar_lead(request: FastAPIRequest) -> JSONResponse:
         log_erro(f'capturar-lead: {e}')
         log_erro(f'capturar-lead traceback: {_last_capture_error}')
         return JSONResponse({'error': 'Erro interno do servidor.'}, status_code=500)
+
+
+@router.put('/api/empresa/contato/{cnpj}')
+async def api_empresa_atualizar_contato(cnpj: str, request: FastAPIRequest) -> JSONResponse:
+    auth = app.storage.user.get('auth')
+    if not auth or auth.get('profile') != 'company':
+        return JSONResponse({'error': 'Nao autorizado'}, status_code=401)
+
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({'error': 'JSON invalido'}, status_code=400)
+
+    cnpj_digits = ''.join(ch for ch in cnpj if ch.isdigit())
+    if len(cnpj_digits) != 14:
+        return JSONResponse({'error': 'CNPJ invalido'}, status_code=400)
+
+    cache = CnpjCache.get_or_none(CnpjCache.cnpj == cnpj_digits)
+    if not cache:
+        return JSONResponse({'error': 'CNPJ nao encontrado no cache'}, status_code=404)
+
+    if 'telefone1' in body:
+        cache.telefone1 = (body['telefone1'] or '').strip() or None
+    if 'telefone2' in body:
+        cache.telefone2 = (body['telefone2'] or '').strip() or None
+    if 'email' in body:
+        cache.email = (body['email'] or '').strip() or None
+    cache.save()
+
+    log_ok(f'Contato atualizado para CNPJ {cnpj_digits}')
+    return JSONResponse({'ok': True})
 
 
 @router.get('/api/debug/last-capture-error')
