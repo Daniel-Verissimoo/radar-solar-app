@@ -387,6 +387,11 @@
             }
 
             const allRows = Object.values(data.instalacoesPorMunicipio).flat();
+
+            const pjByCnpj = new Map();
+            (data.pjs || []).forEach((pj) => {
+                if (pj.cnpj) pjByCnpj.set(pj.cnpj, pj);
+            });
             setupFilter(filterClasse, [...new Set(allRows.map((item) => item.classe))]);
             setupFilter(filterTipo, [...new Set(allRows.map((item) => item.tipo))]);
             setupFilter(filterPorte, [...new Set(allRows.map((item) => item.porte))]);
@@ -825,7 +830,11 @@
                     const captured = capturedCnpjs.has(item.cpf_cnpj);
                     const plusBtn = isPj && !captured
                         ? `<button class="rs-capture-btn" data-capture='${JSON.stringify({ cnpj: String(item.cpf_cnpj), nome: String(item.titular || ''), endereco: String((item.municipio || '') + '/' + (item.uf || '')), telefone: '' }).replace(/'/g, '&#39;')}' style="background:#7c3aed;color:white;border:none;border-radius:4px;padding:0 6px;font-size:16px;cursor:pointer;line-height:24px" title="Capturar lead">+</button>`
-                        : (isPj ? `<span style="display:inline-block;background:#16a34a;color:white;border-radius:4px;padding:0 6px;font-size:14px;line-height:24px">✓</span>` : '');
+                        : (isPj ? `<span style="display:inline-block;background:#16a34a;color:white;border-radius:4px;padding:0 6px;font-size:14px;line-height:24px">\u2713</span>` : '');
+                    const cnpjClean = (item.cpf_cnpj || '').replace(/\D/g, '');
+                    const contatoPj = cnpjClean.length === 14 ? pjByCnpj.get(cnpjClean) : null;
+                    const telefone = contatoPj ? (contatoPj.telefone1 || contatoPj.telefone2 || '') : '';
+                    const email = contatoPj ? (contatoPj.email || '') : '';
                     return `
                     <tr>
                         <td>${plusBtn}</td>
@@ -834,6 +843,8 @@
                         <td>${escapeHtml(item.titular)}</td>
                         <td>${escapeHtml(item.municipio)}</td>
                         <td>${escapeHtml((item.bairros_possiveis ?? [item.bairro]).join(', '))}</td>
+                        <td>${telefone ? escapeHtml(telefone) : '-'}</td>
+                        <td>${email ? escapeHtml(email) : '-'}</td>
                         <td>${escapeHtml(item.classe)}</td>
                         <td>${escapeHtml(item.tipo)}</td>
                         <td>${escapeHtml(item.porte)}</td>
@@ -846,7 +857,7 @@
                         <td>${Number(item.qtd_uc_credito).toLocaleString('pt-BR')}</td>
                         <td>${escapeHtml(item.cep)}</td>
                     </tr>`;
-                }).join('') || '<tr><td colspan="17">Nenhuma instalacao encontrada.</td></tr>';
+                }).join('') || '<tr><td colspan="19">Nenhuma instalacao encontrada.</td></tr>';
             }
 
             function renderInstallations(page = 1) {

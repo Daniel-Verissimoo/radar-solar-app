@@ -492,6 +492,8 @@ def _render_mapa_table() -> None:
                             <th>Titular</th>
                             <th>Municipio</th>
                             <th>Bairros possiveis</th>
+                            <th>Telefone</th>
+                            <th>Email</th>
                             <th>Classe</th>
                             <th>Tipo</th>
                             <th>Porte</th>
@@ -506,7 +508,7 @@ def _render_mapa_table() -> None:
                         </tr>
                     </thead>
                     <tbody class="rs-installations-body">
-                        <tr><td colspan="17">Nenhum municipio selecionado.</td></tr>
+                        <tr><td colspan="19">Nenhum municipio selecionado.</td></tr>
                     </tbody>
                 </table>
             </div>
