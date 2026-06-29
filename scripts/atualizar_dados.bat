@@ -1,13 +1,14 @@
 @echo off
 title Radar Solar - Atualizacao de Dados
+cd /d %~dp0..
 echo ============================================
 echo   Radar Solar - Atualizacao de Dados
 echo ============================================
 echo.
 echo Verificando ambiente Python...
 
-if exist ..\.venv\Scripts\activate.bat (
-    call ..\.venv\Scripts\activate.bat
+if exist .venv\Scripts\activate.bat (
+    call .venv\Scripts\activate.bat
     echo Ambiente virtual ativado.
 ) else (
     echo AVISO: Ambiente virtual nao encontrado.
