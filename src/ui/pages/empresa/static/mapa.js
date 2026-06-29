@@ -626,7 +626,7 @@
                 }
             });
 
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', async function (e) {
                 const popup = e.target.closest('.leaflet-popup');
                 if (!popup) return;
                 const div = popup.querySelector('[class*="rs-contato-"],[class*="rs-edit-contato"]');
