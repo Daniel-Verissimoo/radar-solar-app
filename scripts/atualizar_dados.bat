@@ -16,7 +16,14 @@ if exist .venv\Scripts\activate.bat (
 )
 
 echo.
-echo [1/5] Baixando e processando dados ANEEL...
+echo [1/6] Verificando/baixando base Correios DNE...
+python scripts\baixar_dne.py
+if %errorlevel% neq 0 (
+    echo AVISO: Falha ao baixar DNE (nao critico, bairros serao estimados por IBGE).
+)
+
+echo.
+echo [2/6] Baixando e processando dados ANEEL...
 python scripts\update_aneel_data.py --force
 if %errorlevel% neq 0 (
     echo ERRO: Falha ao atualizar dados ANEEL.
@@ -25,7 +32,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [2/5] Extraindo CSVs com CNPJs...
+echo [3/6] Extraindo CSVs com CNPJs...
 python scripts\extract_aneel_rmr_csv.py --force
 if %errorlevel% neq 0 (
     echo ERRO: Falha ao extrair CSVs.
@@ -34,7 +41,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [3/5] Enriquecendo CNPJs (telefone/email)...
+echo [4/6] Enriquecendo CNPJs (telefone/email)...
 echo ATENCAO: Esta etapa consulta a API CNPJa para cada empresa nova.
 echo Cada consulta leva ~13s. Pode demorar na primeira vez.
 echo Para processar apenas alguns CNPJs de teste, use Ctrl+C e rode:
@@ -48,7 +55,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [4/5] Gerando GeoJSON do mapa...
+echo [5/6] Gerando GeoJSON do mapa...
 python scripts\gerar_mapa_geojson.py
 if %errorlevel% neq 0 (
     echo ERRO: Falha ao gerar GeoJSON.
@@ -57,7 +64,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [5/5] Geocodificando CEPs...
+echo [6/6] Geocodificando CEPs...
 python scripts\geocodificar_ceps.py
 if %errorlevel% neq 0 (
     echo AVISO: Falha ao geocodificar CEPs (nao critico).

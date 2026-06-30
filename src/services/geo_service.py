@@ -37,8 +37,14 @@ RMR_MUNICIPIOS = {
 }
 # ------------------------------------------------------------------------
 @lru_cache(maxsize=1)
+def _dne_delimitado_dir() -> Path:
+    base = ROOT_DIR / 'data' / 'data' / 'raw' / 'correios'
+    dirs = sorted(base.glob('eDNE_Basico_*'))
+    return (dirs[-1] / 'Delimitado') if dirs else base
+
+@lru_cache(maxsize=1)
 def carregar_bairros_por_cep() -> tuple[dict[str, dict[str, set[str]]], dict[str, dict[str, set[str]]]]:
-    DNE_DIR = ROOT_DIR / 'data' / 'data' / 'raw' / 'correios' / 'eDNE_Basico_26031' / 'Delimitado'
+    DNE_DIR = _dne_delimitado_dir()
     CEP_XLSX = ROOT_DIR / 'data' / 'data' / 'raw' / 'correios' / 'ceps_pe.xlsx'
 
     if CEP_XLSX.exists():
@@ -72,9 +78,9 @@ def carregar_bairros_por_cep() -> tuple[dict[str, dict[str, set[str]]], dict[str
 
     localidades_rmr = {}
     for row in _read_dne_rows(DNE_DIR / 'LOG_LOCALIDADE.TXT'):
-        if len(row) < 8 or row[1] != 'PE' or row[7] not in RMR_MUNICIPIOS:
+        if len(row) < 9 or row[1] != 'PE' or row[8] not in RMR_MUNICIPIOS:
             continue
-        localidades_rmr[row[0]] = row[7]
+        localidades_rmr[row[0]] = row[8]
 
     bairros_por_id = {}
     for row in _read_dne_rows(DNE_DIR / 'LOG_BAIRRO.TXT'):
@@ -138,6 +144,7 @@ def carregar_geojson_rmr() -> dict:
 
 
 
+@lru_cache(maxsize=1)
 def carregar_mapa_base_json() -> str:
     return json.dumps(carregar_geojson_rmr(), ensure_ascii=False)
 

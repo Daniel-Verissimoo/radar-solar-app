@@ -8,18 +8,6 @@ from src.utils import log_info
 
 
 PROFILE_CONFIG = {
-    'customer': {
-        'title': 'Gerador de energia',
-        'subtitle': 'Acompanhe geração, créditos e detalhes da conta de luz.',
-        'accent': 'secondary',
-        'icon': 'bolt',
-        'button': 'Enviar link de acesso',
-        'helper': 'Veja geração, compensação, saldo de créditos e sinais de inconsistência.',
-        'chip': 'Fluxo do gerador',
-        'tab_class': 'customer',
-        'panel_class': 'customer',
-        'input_label': 'E-mail do gerador',
-    },
     'company': {
         'title': 'Integrador solar',
         'subtitle': 'Acesse o radar comercial e os sinais de manutenção na região.',
@@ -31,6 +19,18 @@ PROFILE_CONFIG = {
         'tab_class': 'company',
         'panel_class': 'company',
         'input_label': 'E-mail do integrador',
+    },
+    'customer': {
+        'title': 'Gerador de energia',
+        'subtitle': 'Acompanhe geração, créditos e detalhes da conta de luz.',
+        'accent': 'secondary',
+        'icon': 'bolt',
+        'button': 'Enviar link de acesso',
+        'helper': 'Veja geração, compensação, saldo de créditos e sinais de inconsistência.',
+        'chip': 'Fluxo do gerador',
+        'tab_class': 'customer',
+        'panel_class': 'customer',
+        'input_label': 'E-mail do gerador',
     },
 }
 
@@ -73,7 +73,7 @@ def _send_magic_link(email_input: Any, profile_value: str) -> None:
     ''')
 
 
-def render_login(selected_profile: str = 'customer') -> None:
+def render_login(selected_profile: str = 'company') -> None:
     inject_public_styles()
     inject_firebase_auth()
 

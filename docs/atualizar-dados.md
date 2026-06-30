@@ -11,13 +11,20 @@ A cada 1-2 meses, os dados da ANEEL (instalações de energia solar) são atuali
 3. Aguarde o processamento (5-10 minutos)
 4. Leia as instruções no final
 
+> **Nota:** O step [1/6] baixa automaticamente a base de endereços dos Correios (DNE)
+> de `https://www2.correios.com.br/sistemas/edne/download/eDNE_Basico.zip`.
+> Se falhar (sem internet), o pipeline continua — os bairros serão estimados apenas pelo IBGE.
+
 ### Opção B: Terminal
 
 ```bash
 cd C:\radar-solar-copia\radar-solar-dev
-python scripts/update_aneel_data.py --force
-python scripts/gerar_mapa_geojson.py
-python scripts/geocodificar_ceps.py
+python scripts/baixar_dne.py          # [1/6] Baixa base Correios DNE
+python scripts/update_aneel_data.py --force  # [2/6] Dados ANEEL
+python scripts/extract_aneel_rmr_csv.py --force  # [3/6] CNPJs
+python scripts/update_cnpj_enderecos.py  # [4/6] Enriquecimento
+python scripts/gerar_mapa_geojson.py  # [5/6] GeoJSON do mapa
+python scripts/geocodificar_ceps.py   # [6/6] Coordenadas de CEPs
 ```
 
 ## 2. Publicar no GitHub

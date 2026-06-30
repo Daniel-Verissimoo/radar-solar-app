@@ -17,21 +17,6 @@ PRODUCT_ITEMS = [
 
 PROFILE_CARDS = [
     {
-        'icon': 'bolt',
-        'icon_class': 'text-secondary',
-        'title': 'Gerador de energia',
-        'description': 'Acompanha a usina, entende a conta de luz e aciona suporte quando surge uma inconsistência.',
-        'items': [
-            'Visualização da geração, da compensação e do saldo de créditos.',
-            'Leitura mais objetiva das cobranças e do faturamento da distribuidora.',
-            'Solicitação rápida de apoio técnico quando a usina sair do esperado.',
-        ],
-        'button': 'Seguir como gerador',
-        'url': '/login?profile=customer',
-        'props': 'unelevated color=secondary',
-        'delay': 'rs-animate-up-delay-2',
-    },
-    {
         'icon': 'travel_explore',
         'icon_class': 'text-primary',
         'title': 'Integrador solar',
@@ -44,6 +29,21 @@ PROFILE_CARDS = [
         'button': 'Seguir como integrador',
         'url': '/login?profile=company',
         'props': 'unelevated color=primary',
+        'delay': 'rs-animate-up-delay-2',
+    },
+    {
+        'icon': 'bolt',
+        'icon_class': 'text-secondary',
+        'title': 'Gerador de energia',
+        'description': 'Acompanha a usina, entende a conta de luz e aciona suporte quando surge uma inconsistência.',
+        'items': [
+            'Visualização da geração, da compensação e do saldo de créditos.',
+            'Leitura mais objetiva das cobranças e do faturamento da distribuidora.',
+            'Solicitação rápida de apoio técnico quando a usina sair do esperado.',
+        ],
+        'button': 'Seguir como gerador',
+        'url': '/login?profile=customer',
+        'props': 'unelevated color=secondary',
         'delay': 'rs-animate-up-delay-3',
     },
 ]
