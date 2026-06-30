@@ -219,6 +219,17 @@ def _random_point_in_bbox(geometry: dict, seed: int) -> tuple[float, float]:
     return lat, lng
 
 
+@lru_cache(maxsize=1)
+def _load_cep_cache() -> dict:
+    cep_cache_path = Path(CEP_CACHE_PATH)
+    if cep_cache_path.exists():
+        try:
+            with open(cep_cache_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
 def carregar_pjs_mapa(data: dict) -> list[dict]:
     instalacoes = []
     for lista in data['instalacoesPorMunicipio'].values():
@@ -240,14 +251,7 @@ def carregar_pjs_mapa(data: dict) -> list[dict]:
         for codigo, geom in municipio_polygons.items()
     }
 
-    cep_cache = {}
-    cep_cache_path = Path(CEP_CACHE_PATH)
-    if cep_cache_path.exists():
-        try:
-            with open(cep_cache_path, 'r', encoding='utf-8') as f:
-                cep_cache = json.load(f)
-        except Exception:
-            cep_cache = {}
+    cep_cache = _load_cep_cache()
 
     for inst in pjs:
         cnpj = ''.join(ch for ch in inst['cpf_cnpj'] if ch.isdigit())

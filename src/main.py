@@ -52,6 +52,17 @@ try:
 except Exception as exc:
     log_erro(f'Falha ao criar tabelas: {exc}')
 
+log_info('Aquecendo caches de dados...')
+try:
+    from src.services.geo_service import carregar_geojson_rmr, carregar_bairros_por_cep
+    from src.services.aneel_service import carregar_instalacoes_aneel
+    carregar_geojson_rmr()
+    carregar_bairros_por_cep()
+    carregar_instalacoes_aneel()
+    log_ok('Caches aquecidos: GeoJSON, DNE bairros, ANEEL instalacoes')
+except Exception as exc:
+    log_aviso(f'Aquecimento de caches falhou (dados podem estar ausentes): {exc}')
+
 log_info('Registrando rotas de arquivos estaticos...')
 app.add_static_files('/assets', str(ASSETS_DIR))
 app.add_static_files('/empresa/static', str(CURRENT_DIR / 'ui' / 'pages' / 'empresa' / 'static'))

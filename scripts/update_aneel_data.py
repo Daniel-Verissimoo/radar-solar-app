@@ -301,8 +301,13 @@ def read_info_tecnica_for(codigos: set[str], chunksize: int = 250_000) -> pd.Dat
     return pd.concat(frames, ignore_index=True)
 
 
+def _dne_delimitado_dir() -> Path:
+    base = RAW_DIR / 'correios'
+    dirs = sorted(base.glob('eDNE_Basico_*'))
+    return (dirs[-1] / 'Delimitado') if dirs else base
+
 def build_cep_bairro_lookup() -> list[tuple[int, int, str, str]]:
-    dne_dir = RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado'
+    dne_dir = _dne_delimitado_dir()
     faixa_bairro = pd.read_csv(
         dne_dir / 'LOG_FAIXA_BAIRRO.TXT',
         sep='@',
@@ -508,12 +513,14 @@ def process_aneel_data(chunksize: int = 200_000, force_process: bool = False) ->
 def validate_supporting_raw_data() -> bool:
     ibge_dir = RAW_DIR / 'ibge'
 
+    dne_dir = _dne_delimitado_dir()
+
     checks = [
         ('IBGE municipios PE', ibge_dir / 'PE_Municipios_2024' / 'PE_Municipios_2024.shp'),
         ('IBGE bairros PE', ibge_dir / 'PE_bairros_CD2022' / 'PE_bairros_CD2022.shp'),
-        ('Correios DNE delimitado', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_BAIRRO.TXT'),
-        ('Correios DNE faixas bairro', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_FAIXA_BAIRRO.TXT'),
-        ('Correios DNE localidades', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_LOCALIDADE.TXT'),
+        ('Correios DNE delimitado', dne_dir / 'LOG_BAIRRO.TXT'),
+        ('Correios DNE faixas bairro', dne_dir / 'LOG_FAIXA_BAIRRO.TXT'),
+        ('Correios DNE localidades', dne_dir / 'LOG_LOCALIDADE.TXT'),
     ]
 
     log_info('Validando bases auxiliares...')
@@ -523,9 +530,9 @@ def validate_supporting_raw_data() -> bool:
         ('IBGE bairros PE', ibge_dir / 'PE_bairros_CD2022' / 'PE_bairros_CD2022.shp'),
     ]
     opcionais = [
-        ('Correios DNE delimitado', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_BAIRRO.TXT'),
-        ('Correios DNE faixas bairro', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_FAIXA_BAIRRO.TXT'),
-        ('Correios DNE localidades', RAW_DIR / 'correios' / 'eDNE_Basico_26031' / 'Delimitado' / 'LOG_LOCALIDADE.TXT'),
+        ('Correios DNE delimitado', dne_dir / 'LOG_BAIRRO.TXT'),
+        ('Correios DNE faixas bairro', dne_dir / 'LOG_FAIXA_BAIRRO.TXT'),
+        ('Correios DNE localidades', dne_dir / 'LOG_LOCALIDADE.TXT'),
     ]
     for label, path in obrigatorios:
         exists = path.exists()
