@@ -58,6 +58,25 @@ git push
 
 O Render faz deploy automático após o push. Aguarde 2-3 minutos e o site estará com os novos dados.
 
+## Boas práticas para o site não travar
+
+### Leads no mapa
+- Leads com endereço muito distante da RMR não aparecem no mapa, mas ainda consomem memória.
+- **Recomendação:** exclua ou arquive leads de fora de PE pelo Kanban (botão "Arquivar").
+- Leads com CEP vazio ou endereço incompleto forçam geocodificação via Nominatim (API externa lenta). **Sempre informe o CEP ao cadastrar um lead.**
+
+### Empresas (PJs) no mapa
+- As ~2.000 PJs da RMR são carregadas de uma vez. O mapa aguenta bem esse volume.
+- Se no futuro a base crescer muito (+10.000), será necessário paginar ou adicionar busca.
+
+### Navegador
+- Use Chrome ou Edge atualizado. O Leaflet (biblioteca de mapas) é mais pesado em Firefox antigo.
+- Abas extras consumindo RAM podem deixar o mapa lento — mantenha só a aba do Radar Solar aberta.
+
+### Deploy
+- Após git push, o Render leva 2-3 min pra fazer deploy. O site fica fora do ar nesse período.
+- Evite fazer push em horário comercial se possível.
+
 ## Dica
 
 Se o computador já estiver ligado 24h, dá pra agendar no Agendador de Tarefas do Windows:
