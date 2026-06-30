@@ -215,7 +215,7 @@ def demo_mapa() -> None:
     render_mapa('/api/demo/mapa-rmr', show_header=True, include_leads=False)
 
 @ui.page('/login')
-def login(profile: str = 'customer') -> None:
+def login(profile: str = 'company') -> None:
     log_info(f'ROTA /login (profile={profile})')
     auth = app.storage.user.get('auth')
     if auth:
