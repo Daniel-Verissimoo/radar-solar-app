@@ -134,7 +134,6 @@ async def obter_geojson_rmr_assincrono() -> dict:
         log_erro(f"Falha ao ler GeoJSON processado: {exc}")
         return {"type": "FeatureCollection", "features": []}
 
-@lru_cache(maxsize=1)
 def carregar_geojson_rmr() -> dict:
     try:
         return _ler_geojson_estatico(GEOJSON_PRONTO_PATH)

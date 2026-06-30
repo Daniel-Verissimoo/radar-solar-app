@@ -9,9 +9,9 @@ from src.ui.pages.empresa.mapa import (
     montar_mapa_json,
     carregar_pjs_mapa,
     carregar_leads_mapa,
-    MAPA_EMPRESA_TOKENS
+    MAPA_EMPRESA_TOKENS,
 )
-from src.utils import log_erro, log_ok
+from src.utils import log_erro, log_ok, log_aviso
 
 _last_capture_error: str | None = None
 
@@ -43,7 +43,8 @@ async def api_empresa_mapa_rmr(
             headers={'Cache-Control': 'no-store'},
         )
     except Exception:
-        log_erro('Falha interna ao montar mapa-rmr da empresa')
+        tb = traceback.format_exc()
+        log_erro(f'Falha interna ao montar mapa-rmr da empresa:\n{tb}')
         return JSONResponse({'error': 'Erro interno do servidor.'}, status_code=500)
 
 @router.post('/api/empresa/capturar-lead')
@@ -159,5 +160,6 @@ async def api_demo_mapa_rmr() -> Response:
             headers={'Cache-Control': 'no-store'},
         )
     except Exception:
-        log_erro('Falha interna ao montar mapa-rmr demo')
+        tb = traceback.format_exc()
+        log_erro(f'Falha interna ao montar mapa-rmr demo:\n{tb}')
         return JSONResponse({'error': 'Erro interno do servidor.'}, status_code=500)
