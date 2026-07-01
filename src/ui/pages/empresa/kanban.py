@@ -8,6 +8,7 @@ from nicegui import ui
 from src.auth import PerfilConflitanteError, validar_email_para_profile
 from src.database import db
 from src.models import CnpjCache, EmpresaPerfil, InstalacaoSolar, Lead, LeadLog, Usuario
+from src.services.aneel_service import obter_instalacao_por_cnpj
 from src.utils import _format_datetime_br, log_info, log_dados, log_ok, log_aviso
 
 
@@ -15,14 +16,28 @@ STATUS_KANBAN = ['Novo', 'Em Contato', 'Concluído']
 STALE_DAYS = 7
 
 
-def _obter_instalacao_cliente(lead: Lead) -> InstalacaoSolar | None:
+def _obter_cnpj_lead(lead: Lead) -> str | None:
+    if lead.cliente and lead.cliente.cpf_cnpj:
+        cnpj = ''.join(ch for ch in lead.cliente.cpf_cnpj if ch.isdigit())
+        if len(cnpj) == 14:
+            return cnpj
+    return None
+
+
+def _obter_instalacao_cliente(lead: Lead) -> InstalacaoSolar | dict | None:
     if lead.cliente_id:
         inst = InstalacaoSolar.select().where(InstalacaoSolar.usuario == lead.cliente_id).first()
         if inst:
             return inst
     cpf_cnpj = lead.cliente.cpf_cnpj if lead.cliente else None
     if cpf_cnpj:
-        return InstalacaoSolar.select().join(Usuario).where(Usuario.cpf_cnpj == cpf_cnpj).first()
+        inst = InstalacaoSolar.select().join(Usuario).where(Usuario.cpf_cnpj == cpf_cnpj).first()
+        if inst:
+            return inst
+        cnpj_digits = ''.join(ch for ch in cpf_cnpj if ch.isdigit())
+        aneel = obter_instalacao_por_cnpj(cnpj_digits)
+        if aneel:
+            return aneel[0]
     return None
 
 
@@ -300,68 +315,109 @@ def _origem_badge(origem: str) -> None:
     ui.label(rotulo).classes(f'text-xs font-semibold {bg} {tx} px-2 py-0.5 rounded-md')
 
 
+def _get(inst, field, default=''):
+    if inst is None:
+        return default
+    if isinstance(inst, dict):
+        return inst.get(field, default)
+    return getattr(inst, field, default) or default
+
+
 def _render_instalacao_dialog(lead: Lead) -> ui.dialog | None:
     instalacao = _obter_instalacao_cliente(lead)
     if not instalacao:
         return None
+    cnpj = _obter_cnpj_lead(lead)
+    is_dict = isinstance(instalacao, dict)
     with ui.dialog() as dialog, ui.card().classes('p-6 gap-4 min-w-[400px] max-w-[600px]'):
         with ui.row().classes('w-full items-center justify-between'):
             ui.label('Instalacao').classes('text-xl font-bold')
             ui.button(icon='close', on_click=dialog.close).props('flat dense')
         ui.separator()
         with ui.column().classes('w-full gap-2 text-sm'):
-            if instalacao.classe_consumo:
+            classe = _get(instalacao, 'classe_consumo' if not is_dict else 'classe')
+            if classe:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Classe:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.classe_consumo)
-            if instalacao.subgrupo_tarifario:
+                    ui.label(classe)
+            if is_dict:
+                subgrupo = instalacao.get('tipo', '')
+            else:
+                subgrupo = _get(instalacao, 'subgrupo_tarifario')
+            if subgrupo:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Subgrupo:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.subgrupo_tarifario)
-            if instalacao.potencia_instalada_kwp:
+                    ui.label(subgrupo)
+            if is_dict:
+                potencia = instalacao.get('potencia_kw', 0)
+            else:
+                potencia = _get(instalacao, 'potencia_instalada_kwp', 0)
+            if potencia:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Potencia:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(f'{instalacao.potencia_instalada_kwp} kWp')
-            if instalacao.qtd_modulos:
+                    ui.label(f'{potencia} kWp')
+            qtd = _get(instalacao, 'qtd_modulos', 0) if not is_dict else instalacao.get('qtd_modulos', 0)
+            if qtd:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Modulos:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(str(instalacao.qtd_modulos))
-            if instalacao.fabricante_modulo:
+                    ui.label(str(qtd))
+            fab_mod = _get(instalacao, 'fabricante_modulo') if not is_dict else instalacao.get('fabricante_modulo', '')
+            if fab_mod:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Fab. Modulo:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.fabricante_modulo)
-            if instalacao.fabricante_inversor:
+                    ui.label(fab_mod)
+            fab_inv = _get(instalacao, 'fabricante_inversor') if not is_dict else instalacao.get('fabricante_inversor', '')
+            if fab_inv:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Fab. Inversor:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.fabricante_inversor)
-            if instalacao.data_conexao:
+                    ui.label(fab_inv)
+            if is_dict:
+                conexao = instalacao.get('data_conexao', '')
+            else:
+                conexao = instalacao.data_conexao.strftime('%d/%m/%Y') if instalacao.data_conexao else ''
+            if conexao:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Conexao:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.data_conexao.strftime('%d/%m/%Y'))
-            if instalacao.codigo_aneel:
+                    ui.label(conexao)
+            cod_aneel = _get(instalacao, 'codigo_aneel') if not is_dict else instalacao.get('codigo', '')
+            if cod_aneel:
                 with ui.row().classes('w-full gap-2'):
                     ui.label('Cod. ANEEL:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.codigo_aneel)
-            if instalacao.modalidade_geracao:
-                with ui.row().classes('w-full gap-2'):
-                    ui.label('Modalidade:').classes('font-semibold text-slate-500 min-w-20')
-                    ui.label(instalacao.modalidade_geracao)
+                    ui.label(cod_aneel)
+            if is_dict:
+                if instalacao.get('municipio'):
+                    with ui.row().classes('w-full gap-2'):
+                        ui.label('Municipio:').classes('font-semibold text-slate-500 min-w-20')
+                        ui.label(instalacao['municipio'])
+                if instalacao.get('bairro'):
+                    with ui.row().classes('w-full gap-2'):
+                        ui.label('Bairro:').classes('font-semibold text-slate-500 min-w-20')
+                        ui.label(instalacao['bairro'])
+            else:
+                modalidade = _get(instalacao, 'modalidade_geracao')
+                if modalidade:
+                    with ui.row().classes('w-full gap-2'):
+                        ui.label('Modalidade:').classes('font-semibold text-slate-500 min-w-20')
+                        ui.label(modalidade)
 
-        contato = _obter_contato_instalacao(instalacao)
-        cnpj_inst = None
-        if instalacao.usuario_id:
-            c = Usuario.get_or_none(Usuario.id == instalacao.usuario_id)
-            if c and c.cpf_cnpj:
-                cnpj_inst = ''.join(ch for ch in c.cpf_cnpj if ch.isdigit())
         ui.separator()
         with ui.row().classes('w-full items-center justify-between'):
             ui.label('Contato').classes('text-base font-bold')
-            if cnpj_inst and len(cnpj_inst) == 14:
-                ui.button('Editar contato', icon='edit', on_click=lambda cnpj=cnpj_inst, d=dialog: _abrir_edicao_contato(cnpj, d)).props('flat dense text-primary')
+            if cnpj and len(cnpj) == 14:
+                ui.button('Editar contato', icon='edit', on_click=lambda c=cnpj, d=dialog: _abrir_edicao_contato(c, d)).props('flat dense text-primary')
         with ui.column().classes('w-full gap-2 text-sm'):
-            tel1 = (contato or {}).get('telefone1', '')
-            tel2 = (contato or {}).get('telefone2', '')
-            email = (contato or {}).get('email', '')
+            cache_contato = None
+            if cnpj:
+                cache = CnpjCache.get_or_none(CnpjCache.cnpj == cnpj)
+                if cache:
+                    cache_contato = {
+                        'telefone1': cache.telefone1 or '',
+                        'telefone2': cache.telefone2 or '',
+                        'email': cache.email or '',
+                    }
+            tel1 = (cache_contato or {}).get('telefone1', '')
+            tel2 = (cache_contato or {}).get('telefone2', '')
+            email = (cache_contato or {}).get('email', '')
             with ui.row().classes('w-full gap-2'):
                 ui.label('Telefone:').classes('font-semibold text-slate-500 min-w-20')
                 ui.label(tel1 if tel1 else '-').classes('rs-contato-tel1')
@@ -374,7 +430,7 @@ def _render_instalacao_dialog(lead: Lead) -> ui.dialog | None:
     return dialog
 
 
-def _abrir_edicao_contato(cnpj: str, parent_dialog: ui.dialog) -> None:
+def _abrir_edicao_contato(cnpj: str, parent_dialog: ui.dialog | None = None) -> None:
     cache = CnpjCache.get_or_none(CnpjCache.cnpj == cnpj)
     if not cache:
         ui.notify('CNPJ nao encontrado', type='warning')
@@ -399,7 +455,8 @@ def _abrir_edicao_contato(cnpj: str, parent_dialog: ui.dialog) -> None:
                 cache.save()
                 ui.notify('Contato atualizado!', type='positive')
                 edit_dialog.close()
-                parent_dialog.close()
+                if parent_dialog:
+                    parent_dialog.close()
             ui.button('Salvar', on_click=_salvar).props('color=primary')
         edit_dialog.open()
 
@@ -519,6 +576,10 @@ def _render_lead_card(lead: Lead, status: str, mover_lead: Callable[[Lead, str],
             if instalacao_dialog:
                 ui.button(icon='solar_power', on_click=instalacao_dialog.open
                 ).props('flat round color=info size=sm').tooltip('Instalacao')
+            cnpj_card = _obter_cnpj_lead(lead)
+            if cnpj_card and len(cnpj_card) == 14:
+                ui.button(icon='contact_phone', on_click=lambda c=cnpj_card: _abrir_edicao_contato(c, None)
+                ).props('flat round color=warning size=sm').tooltip('Editar contato')
             if on_delete:
                 with ui.dialog() as del_dialog, ui.card().classes('p-5 gap-4'):
                     ui.label(f'Excluir lead de {lead.nome_contato}?').classes('text-lg font-bold')

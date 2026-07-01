@@ -1,9 +1,10 @@
 import pandas as pd
+from collections import defaultdict
 from functools import lru_cache
 from pathlib import Path
 
 from src.normalize import normalizar_inversor, normalizar_modulo
-from src.utils import log_aviso, log_dados, log_info
+from src.utils import log_aviso, log_dados, log_info, log_ok
 
 INSTALACOES_PARQUET = Path(__file__).resolve().parents[2] / 'data' / 'data' / 'processed' / 'aneel' / 'rmr_instalacoes.parquet'
 EMPREENDIMENTOS_CSV = Path(__file__).resolve().parents[2] / 'data' / 'data' / 'processed' / 'aneel' / 'empreendimento-geracao-distribuida-rmr.csv'
@@ -166,3 +167,50 @@ def carregar_instalacoes_aneel() -> tuple[dict[str, dict], dict[str, list[dict]]
     }
 
     return agregados, instalacoes_por_municipio, charts
+
+
+@lru_cache(maxsize=1)
+def carregar_index_cnpj() -> dict[str, list[str]]:
+    dados = carregar_dados_titular()
+    index: dict[str, list[str]] = defaultdict(list)
+    for cod, info in dados.items():
+        cnpj = ''.join(ch for ch in info['cpf_cnpj'] if ch.isdigit())
+        if len(cnpj) >= 11:
+            index[cnpj].append(cod)
+    log_ok(f'Index CNPJ construido: {len(index)} CNPJs mapeados')
+    return dict(index)
+
+
+def obter_instalacao_por_cnpj(cnpj: str) -> list[dict]:
+    cnpj_digits = ''.join(ch for ch in cnpj if ch.isdigit()) if cnpj else ''
+    if len(cnpj_digits) < 11:
+        return []
+    index = carregar_index_cnpj()
+    codes = index.get(cnpj_digits, [])
+    if not codes:
+        return []
+    df = pd.read_parquet(INSTALACOES_PARQUET, filters=[('cod_empreendimento', 'in', codes)])
+    dados_tit = carregar_dados_titular()
+    results = []
+    for row in df.itertuples(index=False):
+        cod = _text(row.cod_empreendimento)
+        extra = dados_tit.get(cod, {})
+        results.append({
+            'codigo': cod,
+            'cpf_cnpj': cnpj_digits,
+            'titular': extra.get('titular', ''),
+            'municipio': _text(row.municipio),
+            'municipio_codigo': _text(row.cod_municipio_ibge),
+            'bairro': _text(row.bairro_estimado) or 'Nao identificado',
+            'classe': _text(row.classe_consumo),
+            'tipo': _text(row.tipo_consumidor),
+            'data_conexao': _date_br(row.data_conexao),
+            'potencia_kw': round(_number(row.potencia_kw), 2),
+            'qtd_modulos': int(_number(row.qtd_modulos)),
+            'fabricante_modulo': normalizar_modulo(_text(row.fabricante_modulo)),
+            'fabricante_inversor': normalizar_inversor(_text(row.fabricante_inversor)),
+            'cep': _text(row.cep_original),
+            'latitude': round(_number(row.latitude), 6),
+            'longitude': round(_number(row.longitude), 6),
+        })
+    return results
